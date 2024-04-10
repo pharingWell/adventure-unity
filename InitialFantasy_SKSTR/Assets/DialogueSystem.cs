@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -7,6 +8,7 @@ public class DialogueSystem : MonoBehaviour
 {
     public TextMeshProUGUI dialogueText;
     public GameObject dialoguePanel;
+    public Button continueButton;
 
     private Queue<string> sentences; // Stores all sentences in the current dialogue
 
@@ -17,6 +19,7 @@ public class DialogueSystem : MonoBehaviour
 
     public void StartDialogue(string[] dialogueLines)
     {
+        continueButton.gameObject.SetActive(true);
         dialoguePanel.SetActive(true); // Show the dialogue panel
         sentences.Clear();
 
@@ -42,11 +45,12 @@ public class DialogueSystem : MonoBehaviour
 
     void EndDialogue()
     {
+        continueButton.gameObject.SetActive(false);
         dialoguePanel.SetActive(false); // Hide the dialogue panel
-        // Here, you can trigger other events, like resuming gameplay
+        // Here, we can trigger other events, like resuming gameplay? 
     }
 
-    // This method can be called by UI buttons or other triggers
+    // This method is called by clicking the continue button
     public void OnContinueButton()
     {
         DisplayNextSentence();
