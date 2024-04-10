@@ -47,7 +47,7 @@ public class BattleSystem : MonoBehaviour
         enemyUnit = enemyGO.GetComponent<Unit>();
 
         // changes the dialogue text to include the enemy's name
-        dialogueText.text = "You encountered a " + enemyUnit.unitName + "!";
+        dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
         
         playerHUD.SetHUD(playerUnit);
         enemyHUD.SetHUD(enemyUnit);
@@ -61,9 +61,9 @@ public class BattleSystem : MonoBehaviour
     IEnumerator PlayerAttack()
     {
         // damage the enemy
-        bool isDead = enemyUnit.TakeDamage(playerUnit.damage);
+        bool isDead = enemyUnit.TakeDamage(playerUnit.AttackDamage);
 
-        enemyHUD.SetHP(enemyUnit.currentHP);
+        enemyHUD.SetHp(enemyUnit.Health);
         dialogueText.text = "The attack is successful!";
 
         //yield return new WaitForSeconds(2f); // need to prevent player from infinite attacking
@@ -87,13 +87,13 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator EnemyTurn() 
     {
-        dialogueText.text = enemyUnit.unitName + " attacks!";
+        dialogueText.text = enemyUnit.Name + " attacks!";
 
         yield return new WaitForSeconds(1f);
 
-        bool isDead = playerUnit.TakeDamage(enemyUnit.damage); // is player dead after taking damage?
+        bool isDead = playerUnit.TakeDamage(enemyUnit.AttackDamage); // is player dead after taking damage?
 
-        playerHUD.SetHP(playerUnit.currentHP);
+        playerHUD.SetHp(playerUnit.Health);
 
         yield return new WaitForSeconds(1f);
 
@@ -132,7 +132,7 @@ public class BattleSystem : MonoBehaviour
     {
         playerUnit.Heal(5); // arbitrary number
         // would probably be dependent on items in future
-        playerHUD.SetHP(playerUnit.currentHP);
+        playerHUD.SetHp(playerUnit.Health);
         dialogueText.text = "You feel renewed strength!";
 
         state = BattleState.ENEMYTURN; // should prevent player from infinite healing

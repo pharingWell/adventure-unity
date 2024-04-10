@@ -13,8 +13,8 @@ namespace FSM
         GameObject enemy;
         
         public Text attackText;
-        
-        public int damage = 10; // damage dealt by player. should be taken from a player object, not hardcoded
+
+        public int damage; // damage dealt by player. should be taken from a player object, not hardcoded
         public int enemyHP;
 
         public void Enter()
@@ -25,6 +25,7 @@ namespace FSM
             // assuming that we have one player tagged as "Player"
             enemy = GameObject.FindWithTag("Enemy");
             player = GameObject.FindWithTag("Player");
+            damage = player.GetComponent<Unit>().AttackDamage;
         }
 
         public void Execute()
