@@ -31,10 +31,10 @@ public class BattleSystem : MonoBehaviour
     void Start()
     {
         state = BattleState.START;
-        SetupBattle();
+        StartCoroutine(SetupBattle()); 
     }
 
-    void SetupBattle() 
+    IEnumerator SetupBattle()  // the coroutine (glorified funtion that handles everything in a state)
     {
         // instantiate a player game object using the player prefab
         // spawn it on top of the player battle station
@@ -51,6 +51,113 @@ public class BattleSystem : MonoBehaviour
         
         playerHUD.SetHUD(playerUnit);
         enemyHUD.SetHUD(enemyUnit);
+
+        yield return new WaitForSeconds(2f); // need coroutines for this line
+
+        state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
+        PlayerTurn();
+    }
+
+    IEnumerator PlayerAttack()
+    {
+        // damage the enemy
+        bool isDead = enemyUnit.TakeDamage(playerUnit.damage);
+
+        enemyHUD.SetHP(enemyUnit.currentHP);
+        dialogueText.text = "The attack is successful!";
+
+        //yield return new WaitForSeconds(2f); // need to prevent player from infinite attacking
+
+        // check if enemy is dead
+        if(isDead)
+        {
+            // end the battle
+            state = BattleState.WON;
+            yield return new WaitForSeconds(2f);
+            EndBattle();
+        } else 
+        {
+            // enemy turn
+            state = BattleState.ENEMYTURN; 
+            yield return new WaitForSeconds(2f);
+            StartCoroutine(EnemyTurn());
+        }
+        // change state based on what happened
+    }
+
+    IEnumerator EnemyTurn() 
+    {
+        dialogueText.text = enemyUnit.unitName + " attacks!";
+
+        yield return new WaitForSeconds(1f);
+
+        bool isDead = playerUnit.TakeDamage(enemyUnit.damage); // is player dead after taking damage?
+
+        playerHUD.SetHP(playerUnit.currentHP);
+
+        yield return new WaitForSeconds(1f);
+
+        if (isDead) // player is dead
+        {
+            state = BattleState.LOST;
+            EndBattle();
+        } else // player survived
+        {
+            state = BattleState.PLAYERTURN;
+            PlayerTurn();
+        }
+
+    }
+
+    void EndBattle() // should probably turn this into a coroutine later
+    {
+        // only updating dialogue text at the moment, so coroutine isn't necessary... yet
+        if (state == BattleState.WON)
+        {
+            dialogueText.text = "You won the battle!";
+        } else if (state == BattleState.LOST)
+        {
+            dialogueText.text = "You lost.";
+            // would probably load out of battle 
+        }
+    }
+
+
+    void PlayerTurn() 
+    {
+        dialogueText.text = "Choose an action:";
+    }
+
+    IEnumerator PlayerHeal() 
+    {
+        playerUnit.Heal(5); // arbitrary number
+        // would probably be dependent on items in future
+        playerHUD.SetHP(playerUnit.currentHP);
+        dialogueText.text = "You feel renewed strength!";
+
+        state = BattleState.ENEMYTURN; // should prevent player from infinite healing
+
+        yield return new WaitForSeconds(2f);
+        // player used their turn by healing
+        // we could choose for them to be able to use items without turn ending
+        //state = BattleState.ENEMYTURN;
+        StartCoroutine(EnemyTurn());
+    }
+
+    public void OnAttackButton() // player clicks attack button
+    {
+        if (state != BattleState.PLAYERTURN) 
+            return;
+
+        StartCoroutine(PlayerAttack());
+    }
+
+    public void OnHealButton() // player clicks heal button
+    {
+        if (state != BattleState.PLAYERTURN) 
+            return;
+
+        StartCoroutine(PlayerHeal());
     }
 
 }
