@@ -1,10 +1,10 @@
 namespace FSM
 {
-    public class TestState : IState
+    public class ExampleState : IState
     {
         TestImplementation owner;
  
-        public TestState(TestImplementation owner) { this.owner = owner; }
+        public ExampleState(TestImplementation owner) { this.owner = owner; }
         public void Enter()
         {
             throw new System.NotImplementedException();

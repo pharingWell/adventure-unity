@@ -34,7 +34,7 @@ public class BattleSystem : MonoBehaviour
         StartCoroutine(SetupBattle()); 
     }
 
-    IEnumerator SetupBattle()  // the coroutine (glorified funtion that handles everything in a state)
+    IEnumerator SetupBattle()  // the coroutine (glorified function that handles everything in a state)
     {
         // instantiate a player game object using the player prefab
         // spawn it on top of the player battle station
