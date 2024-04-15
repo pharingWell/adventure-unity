@@ -13,7 +13,7 @@ public class LevelMove_Ref : MonoBehaviour
         GetComponent<Collider2D>().isTrigger = true;
     }
 
-    void onTriggerEnter2D(Collider2D other) {
+    void OnTriggerEnter2D(Collider2D other) {
         Debug.Log("trigger touched");
         if(other.CompareTag("Player")) {
             SceneManager.LoadScene("Map");
