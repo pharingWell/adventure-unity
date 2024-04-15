@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class LevelMove_Ref : MonoBehaviour
+public class DoorAnimate : MonoBehaviour
 {
-    public int sceneBuildIndex;
-
+    [SerializeField] private Animator animator;
+    
     void Awake()
     {
         //Make Collider2D as trigger 
@@ -16,7 +15,15 @@ public class LevelMove_Ref : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other) {
         // Debug.Log("trigger touched");
         if(other.CompareTag("Player")) {
-            SceneManager.LoadScene("Map");
+            animator.SetBool("door_open", true);
+
         }
     }
+    void OnTriggerExit2D(Collider2D other) {
+        animator.SetBool("door_open", false);
+    
+    }
+
+
+
 }
