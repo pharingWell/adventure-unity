@@ -12,10 +12,8 @@ public class PlayerController : MonoBehaviour
     private bool isFacingRight = true;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private LayerMask waterLayer;
-
-    // for later
-    // [SerializeField] private Animator animator;
-    // [SerializeField] private SpriteRenderer sr;
+    [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer sr;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +27,8 @@ public class PlayerController : MonoBehaviour
     {
         horizontal = Input.GetAxis("Horizontal") * playerMoveSpeed;
         vertical = Input.GetAxis("Vertical") * playerMoveSpeed;
-
+        animator.SetFloat("PlayerXSpeed", Mathf.Abs(horizontal));
+        animator.SetFloat("PlayerYSpeed", vertical);
 
         if ((isFacingRight && horizontal < 0.0f) || (!isFacingRight && horizontal > 0.0f)) {
             isFacingRight = !isFacingRight;
@@ -55,6 +54,6 @@ public class PlayerController : MonoBehaviour
         }
 
         // Flip the player sprite if needed
-        // sr.flipX = !isFacingRight;
+        sr.flipX = !isFacingRight;
     }
 }

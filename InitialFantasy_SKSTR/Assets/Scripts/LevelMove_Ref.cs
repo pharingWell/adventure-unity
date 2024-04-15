@@ -16,7 +16,7 @@ public class LevelMove_Ref : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other) {
         // Debug.Log("trigger touched");
         if(other.CompareTag("Player")) {
-            SceneManager.LoadScene("Map");
+            SceneManager.LoadScene(sceneBuildIndex, LoadSceneMode.Single);
         }
     }
 }
