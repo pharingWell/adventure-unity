@@ -1,41 +1,114 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GBD.SaveSystem;
 using UnityEngine; //https://github.com/GabrielBigardi/Generic-Save-System/blob/main/DOCUMENTATION.md
 
-public static class GameSecrets
+public class SaveManagerSingleton
 {
-    public const string SAVE_KEY = "6c1996cf353b4593cb393055e1c0c27c";
-}
+    private static SaveManager _instance;
 
-public class SaveStateSingleton
-{
-    private static SaveState _instance;
-
-    public static SaveState GetInstance()
+    public static SaveManager GetInstance()
     {
-        if (_instance == null) {_instance = new SaveState();}
+        if (_instance == null) {_instance = new SaveManager();}
         return _instance;
     }
 }
 
-public class SaveState
+public struct TypeConduitValue
 {
-    [SerializeField] public Unit player;
-    public SaveState()
+    public Type Type;
+    public Conduit<object> Conduit;
+    public object Value;
+    public bool IsValueValid;
+}
+
+public struct TypeObjectPair
+{
+    public Type Type;
+    public object Object;
+
+    public TypeObjectPair(Type t, object o)
     {
-       // player.Save(this);
+        Type = t;
+        Object = o;
     }
 }
 
-public class TypedObjectList<T>
+public struct ObjectSaveData
 {
-    public Type Type;
-    public List<T> List;
+    public int ID;
+    public List<TypeObjectPair> TypeObjectPairs;
+
+    public ObjectSaveData(int id, List<TypeObjectPair> typeObjectPairs)
+    {
+        ID = id;
+        TypeObjectPairs = typeObjectPairs;
+    }
 }
 
-public class SaveSystem
+public class SaveManager
 {
-    Conduit<T>
+    private const string FileName = "SaveGame";
+    private Dictionary<int, List<TypeConduitValue>> _registeredObjects;
+    public static void Register(int id,  List<TypeConduitValue> typeObjectList)
+    {
+        
+        // TODO: map saved values to conduit values (one to one?)
+        
+        SaveManager self = SaveManagerSingleton.GetInstance();
+        if (!self._registeredObjects.ContainsKey(id))
+        {
+            self._registeredObjects.Add(id, typeObjectList); 
+        }
+        else
+        {
+            foreach (TypeConduitValue typeConduitValue in self._registeredObjects[id])
+            {
+                if (typeConduitValue.IsValueValid)
+                    typeConduitValue.Conduit.Set(typeConduitValue.Value);
+            }
+        }
+    }
+
+    public static void Save()
+    {
+        
+        SaveManager self = SaveManagerSingleton.GetInstance();
+        List<int> keys = self._registeredObjects.Keys.ToList();
+        List<ObjectSaveData> saveData = keys.ConvertAll(id =>
+        {
+            return new ObjectSaveData(id,
+                self._registeredObjects[id].ConvertAll(
+                    x => new TypeObjectPair(x.Type, x.Conduit.Get())
+                )
+            );
+
+        });
+        bool saveSuccess = SaveSystem.SaveGame(FileName, saveData, GameSecrets.SaveKey);
+        if (!saveSuccess)
+        {
+            Debug.Log("Error while saving");
+            return;
+        }
+    }
+
+    public static void Load()
+    {
+        List<ObjectSaveData> saveData;
+        bool loadSuccess = SaveSystem.LoadGame(FileName, out saveData, GameSecrets.SaveKey);
+        if (!loadSuccess)
+        {
+            Debug.Log("Error while loading");
+            return;
+        }
+        
+        SaveManager self = SaveManagerSingleton.GetInstance();
+        foreach (ObjectSaveData objectSaveData in saveData)
+        {
+            //self._savedData[objectSaveData.ID].AddRange(objectSaveData.TypeObjectPairs);
+        }
+    }
+    
     
 }

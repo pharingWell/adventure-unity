@@ -55,13 +55,4 @@ public class Unit : MonoBehaviour, ISavable
         currentHp += Math.Min(amount, maxHp-currentHp); // don't go over max health 
     }
 
-    public void Save()
-    {   
-        
-    }
-    
-    public void Load(SaveState instance)
-    {
-        
-    }
 }
