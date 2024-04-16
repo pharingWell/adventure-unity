@@ -25,9 +25,12 @@ public class DialogueSystem : MonoBehaviour
 
         foreach (string sentence in dialogueLines)
         {
-            sentences.Enqueue(sentence); // Add all lines to the queue
-        }
+            if (CheckGameStateConditions(sentence)) {
+                sentences.Enqueue(sentence); // Add all lines to the queue
 
+            }
+            
+        }
         DisplayNextSentence();
     }
 
@@ -54,5 +57,12 @@ public class DialogueSystem : MonoBehaviour
     public void OnContinueButton()
     {
         DisplayNextSentence();
+    }
+
+    private bool CheckGameStateConditions(string line)
+    {
+    // Implement logic to check if a dialogue line should be added based on current game state
+    // For example, checking if a player has discovered a certain secret or completed a specific quest
+    return true; // Placeholder
     }
 }
