@@ -57,7 +57,7 @@ public class Unit : MonoBehaviour, ISavable
 
     public void Save()
     {   
-        Conduit<string> z = new Conduit<string>(s => unitName = s,() => unitName);
+        
     }
     
     public void Load(SaveState instance)

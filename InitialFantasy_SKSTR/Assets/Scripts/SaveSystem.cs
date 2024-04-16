@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using GBD.SaveSystem;
 using UnityEngine; //https://github.com/GabrielBigardi/Generic-Save-System/blob/main/DOCUMENTATION.md
 
@@ -26,19 +28,14 @@ public class SaveState
     }
 }
 
-public class Conduit<T>
+public class TypedObjectList<T>
 {
-    public readonly System.Action<T> Set;
-    public readonly System.Func<T> Get;
- 
-    public Conduit(System.Action<T> set, System.Func<T> get)
-    {
-        this.Set = set;
-        this.Get = get;
-    }
+    public Type Type;
+    public List<T> List;
 }
 
-public class SaveManager
+public class SaveSystem
 {
+    Conduit<T>
     
 }
