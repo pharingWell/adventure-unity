@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.gabrielbigardi.savesystem": {
+      "version": "https://github.com/GabrielBigardi/Generic-Save-System.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "08478ea5be5163e177e09d2eba613b875909d5d6"
+    },
     "com.unity.2d.animation": {
       "version": "9.1.0",
       "depth": 1,

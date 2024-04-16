@@ -1,18 +1,13 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class Unit : MonoBehaviour
+public class Unit : MonoBehaviour, ISavable
 {
-    
     [SerializeField] private string unitName;
     [SerializeField] private int unitLevel;
     [SerializeField] private int attackDamage;
     [SerializeField] private int currentHp;
     [SerializeField] private int maxHp;
-        
     public Unit(string unitName, int unitLevel, int startingHp, int maxHp, int attackDamage) {
         Name = unitName;
         Level = unitLevel;
@@ -23,8 +18,8 @@ public class Unit : MonoBehaviour
 
     public string Name
     {
-        get => unitName;
-        private set => unitName = value;
+        get => unitName; 
+        set => unitName = value;
     }
     public int Level
     {
@@ -58,5 +53,15 @@ public class Unit : MonoBehaviour
     public void Heal(int amount) 
     {
         currentHp += Math.Min(amount, maxHp-currentHp); // don't go over max health 
+    }
+
+    public void Save()
+    {   
+        Conduit<string> z = new Conduit<string>(s => unitName = s,() => unitName);
+    }
+    
+    public void Load(SaveState instance)
+    {
+        
     }
 }
