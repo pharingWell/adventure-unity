@@ -39,6 +39,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 2450340067
+    locked: 0
   - name: Battle Station
     uniqueID: 18235989
     locked: 0
