@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using GBD.SaveSystem;
-using UnityEngine.Serialization;
 using Debug = UnityEngine.Debug; //https://github.com/GabrielBigardi/Generic-Save-System/blob/main/DOCUMENTATION.md
 
 public class SaveManagerSingleton
@@ -25,6 +23,12 @@ public struct TypeConduitPair
     {
         Type = t;
         Conduit = value;
+    }
+
+    public TypeConduitPair(Type t, Action<object> set, Func<object> get)
+    {
+        Type = t;
+        Conduit = new Conduit<object>(set, get);
     }
 }
 
@@ -106,47 +110,56 @@ public class SaveManager
 {
     private const string FileName = "SaveGame";
     private Dictionary<int, List<ConduitValuePair>> _gameStateObjects;
+    private static SaveManager _self;
+    private static void _setup()
+    {
+        if (_self is null)
+        {
+            _self = new SaveManager
+            {
+                _gameStateObjects = new Dictionary<int, List<ConduitValuePair>>()
+            };
+        }
+    }
     public static void Register(int id,  List<TypeConduitPair> typeConduitPairs)
     {
         
-        // TODO: map saved values to conduit values (one to one?)
-        
-        SaveManager self = SaveManagerSingleton.GetInstance();
-        if (self._gameStateObjects[id].Count != typeConduitPairs.Count) //checks for variable updates/reregister updates
+        _setup();
+        if (_self._gameStateObjects[id].Count != typeConduitPairs.Count) //checks for variable updates/reregister updates
         {
-            self._gameStateObjects.Remove(id);
+            _self._gameStateObjects.Remove(id);
         }
         
-        if (!self._gameStateObjects.ContainsKey(id)) 
+        if (!_self._gameStateObjects.ContainsKey(id)) 
         {
-            self._gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x))); 
+            _self._gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x))); 
         }
         else
         {
             for (int i = 0; i < typeConduitPairs.Count; i++)
             {
                 TypeConduitPair typeConduitPair = typeConduitPairs[i];
-                ConduitValuePair conduitValuePair = self._gameStateObjects[id][i];
+                ConduitValuePair conduitValuePair = _self._gameStateObjects[id][i];
                 if (conduitValuePair.IsValueValid)
                 {
                     bool successful = typeConduitPair.Conduit.SetVariable(conduitValuePair.ValuePair);
                     if (!successful) conduitValuePair.AddValuePair(typeConduitPair.Conduit.GetVariable());
                 }
                 conduitValuePair.AddConduitPair(typeConduitPair);
-                self._gameStateObjects[id][i] = conduitValuePair;
+                _self._gameStateObjects[id][i] = conduitValuePair;
             }
         }
     }
 
     public static void Save()
     {
-        
-        SaveManager self = SaveManagerSingleton.GetInstance();
-        List<int> keys = self._gameStateObjects.Keys.ToList();
+
+        _setup();
+        List<int> keys = _self._gameStateObjects.Keys.ToList();
         List<ObjectSaveData> saveData = keys.ConvertAll(id =>
         {
             return new ObjectSaveData(id,
-                self._gameStateObjects[id].ConvertAll(
+                _self._gameStateObjects[id].ConvertAll(
                     x => new TypeValuePair(x.TypeConduitPair.Type, x.TypeConduitPair.Conduit.GetVariable()) //hash assigned here
                 )
             );
@@ -167,13 +180,13 @@ public class SaveManager
             Debug.Log("Error while loading");
             return;
         }
-        
-        SaveManager self = SaveManagerSingleton.GetInstance();
+
+        _setup();
         foreach (ObjectSaveData objectSaveData in saveData)
         {
             if (objectSaveData.Hash == objectSaveData.TypeValuePairs.GetHashCode()) //is loaded data valid
             {
-                if(!self._gameStateObjects.TryAdd(objectSaveData.ID,
+                if(!_self._gameStateObjects.TryAdd(objectSaveData.ID,
                     objectSaveData.TypeValuePairs.ConvertAll(x => new ConduitValuePair(x))
                     )
                 ){ 
@@ -183,21 +196,21 @@ public class SaveManager
                        if the order changes (which is what would need to happen for the above),
                        the hash should too, making the data invalid and preventing corruption */
                     
-                    var conduits = self._gameStateObjects[objectSaveData.ID];
+                    var conduits = _self._gameStateObjects[objectSaveData.ID];
                     var data = objectSaveData.TypeValuePairs;
                     for(int index = 0; index < data.Count; index++)
                     {
                         conduits[index].TypeConduitPair.Conduit.SetVariable(data[index]);
                         conduits[index].AddValuePair(data[index]);
                     }
-                    self._gameStateObjects.Add(objectSaveData.ID, conduits);
+                    _self._gameStateObjects.Add(objectSaveData.ID, conduits);
                 }
             }
             else
             {
                 Debug.Log("Warning while loading: Failed to load with ID " + objectSaveData.ID);
             }
-            //self._savedData[objectSaveData.ID].AddRange(objectSaveData.TypeValuePairs);
+            //_self._savedData[objectSaveData.ID].AddRange(objectSaveData.TypeValuePairs);
         }
     }
     

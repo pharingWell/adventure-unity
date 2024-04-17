@@ -1,61 +1,44 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Unit : MonoBehaviour, ISavable
 {
-    [SerializeField] private string unitName;
-    [SerializeField] private int unitLevel;
-    [SerializeField] private int attackDamage;
-    [SerializeField] private int currentHp;
-    [SerializeField] private int maxHp;
-    public Unit(string unitName, int unitLevel, int startingHp, int maxHp, int attackDamage) {
-        Name = unitName;
-        Level = unitLevel;
+    public string Name { get; set; }
+    public int Level { get; set; }
+    public int Health { get; set; }
+    public int MaxHealth { get; set; }
+    public int AttackDamage { get; set; }
+    public Unit(string name, int level, int startingHp, int maxHp, int attackDamage) {
+        Name = name;
+        Level = level;
         Health = startingHp;
         MaxHealth = maxHp;
         AttackDamage = attackDamage;
-        Conduit<string> t = new Conduit<string>(s => Name = s, () => Name);
+        SaveManager.Register(GetInstanceID(),    
+            new List<TypeConduitPair>{
+                new(typeof(string), o => Name = (string)o, () => Name),
+                new (typeof(int), o => Level = (int)o, () => Level),
+                new (typeof(int), o => Health = (int)o, () => Health),
+                new (typeof(int), o => MaxHealth = (int)o, () => MaxHealth),
+                new (typeof(int), o => AttackDamage = (int)o, () => AttackDamage)
+            }
+        );
     }
-    
-    
-    
-    public string Name
-    {
-        get => unitName; 
-        set => unitName = value;
-    }
-    public int Level
-    {
-        get => unitLevel;
-        private set => unitLevel = value;
-    }
-    public int Health
-    {
-        get => currentHp;
-        private set => currentHp = value;
-    }
-    public int MaxHealth
-    {
-        get => maxHp;
-        private set => maxHp = value;
-    }
-    public int AttackDamage
-    {
-        get => attackDamage;
-        private set => attackDamage = value;
-    }
+
+
     
     public bool TakeDamage(int amount)
     {
-        if (amount > 0) currentHp -= Math.Min(amount, currentHp); // don't go under 0
+        if (amount > 0) Health -= Math.Min(amount, Health); // don't go under 0
        
-        if (currentHp < 0) currentHp = 0;
-        return (currentHp == 0);  // if the health is 0 or less, then unit is dead
+        if (Health < 0) Health = 0;
+        return (Health == 0);  // if the health is 0 or less, then unit is dead
     }
 
     public void Heal(int amount) 
     {
-        currentHp += Math.Min(amount, maxHp-currentHp); // don't go over max health 
+        Health += Math.Min(amount, MaxHealth-Health); // don't go over max health 
     }
 
 }

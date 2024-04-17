@@ -50,13 +50,14 @@ public class BattleSystem : MonoBehaviour
 
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
-        
+        SaveManager.Save();
         playerHUD.SetHUD(playerUnit);
         enemyHUD.SetHUD(enemyUnit);
 
         yield return new WaitForSeconds(2f); // need coroutines for this line
 
         state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
+        SaveManager.Load();
         PlayerTurn();
     }
 

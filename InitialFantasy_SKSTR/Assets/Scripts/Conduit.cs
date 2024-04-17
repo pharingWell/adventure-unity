@@ -2,14 +2,21 @@
 using System;
 using UnityEngine;
 
+
+
 public class Conduit<T>{
     private readonly Action<T> _set;
     private readonly Func<T> _get;
+    
+
+    
     public Conduit(Action<T> set, Func<T> get)
     {
         _set = set;
         _get = get;
     }
+
+
 
     public bool SetVariable(TypeValuePair typeValuePair)
     {
