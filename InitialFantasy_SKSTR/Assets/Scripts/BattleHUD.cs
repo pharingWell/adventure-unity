@@ -11,6 +11,7 @@ public class BattleHUD : MonoBehaviour
 {
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI levelText;
+    public TextMeshProUGUI hpText; // also want hp displayed
     public Slider hpSlider;
 
     public void SetHUD(Unit unit)
@@ -19,9 +20,11 @@ public class BattleHUD : MonoBehaviour
         levelText.text = "Level " + unit.Level;
         hpSlider.maxValue = unit.MaxHealth;
         hpSlider.value = unit.Health;
+        hpText.text = "HP " + unit.Health; // display hp
     } 
 
     public void SetHp(int hp) {
         hpSlider.value = hp;
+        hpText.text = "HP " + hp; // update HP text
     }
 }

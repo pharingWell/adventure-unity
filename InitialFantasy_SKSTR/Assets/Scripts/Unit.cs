@@ -9,13 +9,17 @@ public class Unit : MonoBehaviour
     
     [SerializeField] private string unitName;
     [SerializeField] private int unitLevel;
+    [SerializeField] private int xp;
+    [SerializeField] private int levelUpAmount;
     [SerializeField] private int attackDamage;
     [SerializeField] private int currentHp;
     [SerializeField] private int maxHp;
         
-    public Unit(string unitName, int unitLevel, int startingHp, int maxHp, int attackDamage) {
+    public Unit(string unitName, int unitLevel, int xp, int levelUpAmount, int startingHp, int maxHp, int attackDamage) {
         Name = unitName;
         Level = unitLevel;
+        XP = xp;
+        LevelUpAmount = levelUpAmount;
         Health = startingHp;
         MaxHealth = maxHp;
         AttackDamage = attackDamage;
@@ -31,6 +35,17 @@ public class Unit : MonoBehaviour
         get => unitLevel;
         private set => unitLevel = value;
     }
+    public int XP
+    {
+        get => xp;
+        private set => xp = value;
+    }
+    public int LevelUpAmount
+    {
+        get => levelUpAmount;
+        private set => levelUpAmount = value;
+    }
+
     public int Health
     {
         get => currentHp;
@@ -59,4 +74,32 @@ public class Unit : MonoBehaviour
     {
         currentHp += Math.Min(amount, maxHp-currentHp); // don't go over max health 
     }
+
+    public void GainXP(int amount)
+    {
+        if ((xp + amount) >= levelUpAmount) // if the player has enough xp to level up
+        {   
+            Debug.Log("should level up");
+            LevelUp(amount); // call LevelUp function
+        } else 
+        {
+            xp += amount; // add gained xp to xp total
+        }
+    }
+
+    public void LevelUp(int amount) {
+        // first, update the amount of xp the player has now
+        // i'm going by the system of current xp + xp --> level up! 
+        // then current xp resets to 0 + whatever xp wasn't used to level up
+        xp += amount;
+        xp -= levelUpAmount;
+        unitLevel += 1;
+        levelUpAmount = levelUpAmount * 500; // new threshold for leveling up
+
+        // now boost stats
+        maxHp += 3; // each level gives an additional 3 maxHp
+        currentHp = maxHp; // heal player after battle?
+        attackDamage += 2; // each level gives an additional 2 attackDamage
+    }
+
 }

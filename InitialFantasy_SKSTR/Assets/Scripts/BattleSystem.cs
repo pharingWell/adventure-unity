@@ -11,12 +11,15 @@ public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
 public class BattleSystem : MonoBehaviour
 {
+    // prefabs
     public GameObject playerPrefab;
     public GameObject enemyPrefab;
 
+    // battle stations are the hexagons the enemy and player sit on 
     public Transform playerBattleStation;
     public Transform enemyBattleStation;
 
+    // two instances of Unit
     Unit playerUnit;
     Unit enemyUnit;
 
@@ -55,34 +58,9 @@ public class BattleSystem : MonoBehaviour
         yield return new WaitForSeconds(2f); // need coroutines for this line
 
         state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
+        // if we want the enemy to go first, the above line should be state = BattleState.PLAYERTURN;
+        // and then below, EnemyTurn();
         PlayerTurn();
-    }
-
-    IEnumerator PlayerAttack()
-    {
-        // damage the enemy
-        bool isDead = enemyUnit.TakeDamage(playerUnit.AttackDamage);
-
-        enemyHUD.SetHp(enemyUnit.Health);
-        dialogueText.text = "The attack is successful!";
-
-        //yield return new WaitForSeconds(2f); // need to prevent player from infinite attacking
-
-        // check if enemy is dead
-        if(isDead)
-        {
-            // end the battle
-            state = BattleState.WON;
-            yield return new WaitForSeconds(2f);
-            EndBattle();
-        } else 
-        {
-            // enemy turn
-            state = BattleState.ENEMYTURN; 
-            yield return new WaitForSeconds(2f);
-            StartCoroutine(EnemyTurn());
-        }
-        // change state based on what happened
     }
 
     IEnumerator EnemyTurn() 
@@ -93,7 +71,7 @@ public class BattleSystem : MonoBehaviour
 
         bool isDead = playerUnit.TakeDamage(enemyUnit.AttackDamage); // is player dead after taking damage?
 
-        playerHUD.SetHp(playerUnit.Health);
+        playerHUD.SetHp(playerUnit.Health); // player's hp bar reflects new hp; also updates hp text
 
         yield return new WaitForSeconds(1f);
 
@@ -109,23 +87,67 @@ public class BattleSystem : MonoBehaviour
 
     }
 
-    void EndBattle() // should probably turn this into a coroutine later
+    void PlayerTurn() 
+    {
+        dialogueText.text = "Choose an action:";
+    }
+
+     IEnumerator PlayerAttack()
+    {
+        // damage the enemy
+        bool isDead = enemyUnit.TakeDamage(playerUnit.AttackDamage);
+
+        enemyHUD.SetHp(enemyUnit.Health);
+        dialogueText.text = "The attack is successful!";
+        yield return new WaitForSeconds(1f); // could be more
+        dialogueText.text = "You dealt " + playerUnit.AttackDamage + " damage!";
+
+        // check if enemy is dead
+        if(isDead)
+        {
+            // end the battle
+            state = BattleState.WON;
+            yield return new WaitForSeconds(2f);
+            StartCoroutine(EndBattle());
+        } else 
+        {
+            // enemy turn
+            state = BattleState.ENEMYTURN; 
+            yield return new WaitForSeconds(2f);
+            StartCoroutine(EnemyTurn());
+        }
+        // change state based on what happened
+    }
+
+    IEnumerator EndBattle() // should probably turn this into a coroutine later
     {
         // only updating dialogue text at the moment, so coroutine isn't necessary... yet
         if (state == BattleState.WON)
         {
             dialogueText.text = "You won the battle!";
+            yield return new WaitForSeconds(2f);
+            // maybe the player gains xp? obviously they don't really get to "keep" their levels
+            // but the illusion of getting xp and levels
+            int currLevel = playerUnit.Level;
+            playerUnit.GainXP(enemyUnit.XP); // player gains as much xp as the enemy has
+            dialogueText.text = "You gained " + enemyUnit.XP + " XP.";
+            if (currLevel < playerUnit.Level) 
+            {   
+                yield return new WaitForSeconds(1f);
+                dialogueText.text = "Wow! You leveled up to " + playerUnit.Level + ".";
+                yield return new WaitForSeconds(2f);
+                dialogueText.text = "Your Max HP is now " + playerUnit.MaxHealth 
+                                    + ", and your Attack is " + playerUnit.AttackDamage + ".";
+            } else 
+            {
+                yield return new WaitForSeconds(1f);
+                dialogueText.text = "[End Battle]";
+            }
         } else if (state == BattleState.LOST)
         {
             dialogueText.text = "You lost.";
             // would probably load out of battle 
         }
-    }
-
-
-    void PlayerTurn() 
-    {
-        dialogueText.text = "Choose an action:";
     }
 
     IEnumerator PlayerHeal() 
