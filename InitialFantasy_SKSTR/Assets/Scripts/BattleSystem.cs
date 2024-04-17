@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using IFSKSTR.SaveSystem;
 using UnityEngine.UIElements; // needed for TextMeshProUGUI to work
 
 // i used the tutorial from https://www.youtube.com/watch?v=_1pz_ohupPs
@@ -50,14 +51,13 @@ public class BattleSystem : MonoBehaviour
 
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
-        SaveManager.Save();
         playerHUD.SetHUD(playerUnit);
         enemyHUD.SetHUD(enemyUnit);
-
+        
         yield return new WaitForSeconds(2f); // need coroutines for this line
-
+        SaveSystem.Save();
         state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
-        SaveManager.Load();
+        SaveSystem.Load();
         PlayerTurn();
     }
 

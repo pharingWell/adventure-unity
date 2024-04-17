@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
+using IFSKSTR.SaveSystem;
 using UnityEngine;
 
-public class Unit : MonoBehaviour, ISavable
+public class Unit : MonoBehaviour
 {
-    public string Name { get; set; }
-    public int Level { get; set; }
-    public int Health { get; set; }
-    public int MaxHealth { get; set; }
-    public int AttackDamage { get; set; }
-    public Unit(string name, int level, int startingHp, int maxHp, int attackDamage) {
-        Name = name;
-        Level = level;
-        Health = startingHp;
-        MaxHealth = maxHp;
-        AttackDamage = attackDamage;
-        SaveManager.Register(GetInstanceID(),    
+    [SerializeField] private string unitName;
+    public string Name { get => unitName; set => unitName = Name; }
+    [SerializeField] private int level;
+    public int Level { get => level; set => level = Level; }
+    private int _health;
+    public int Health { get => _health; set => _health = Health; }
+    [SerializeField] private int maxHealth;
+    public int MaxHealth { get => maxHealth; set => maxHealth = MaxHealth; }
+    [SerializeField] private int attackDamage;
+    public int AttackDamage { get => attackDamage; set => attackDamage = AttackDamage; }
+
+    private void Start()
+    {
+        SaveSystem.Register(GetInstanceID(),    
             new List<TypeConduitPair>{
                 new(typeof(string), o => Name = (string)o, () => Name),
                 new (typeof(int), o => Level = (int)o, () => Level),
@@ -26,8 +29,6 @@ public class Unit : MonoBehaviour, ISavable
         );
     }
 
-
-    
     public bool TakeDamage(int amount)
     {
         if (amount > 0) Health -= Math.Min(amount, Health); // don't go under 0
