@@ -44,25 +44,46 @@ public struct ConduitValuePair
 {
     public TypeConduitPair TypeConduitPair { get; set; }
     public TypeValuePair ValuePair { get; set; }
+    public bool IsValueValid;
+    public bool IsConduitValid;
 
     public ConduitValuePair(TypeConduitPair typeConduitPair)
     {
         ValuePair = new TypeValuePair();
+        IsValueValid = false;
+        
         TypeConduitPair = typeConduitPair;
+        IsConduitValid = true;
     }
     public ConduitValuePair(TypeValuePair typeValuePair)
     {
-        ValuePair = new TypeValuePair();
+        ValuePair = typeValuePair;
+        IsValueValid = true;
+        
         TypeConduitPair = new TypeConduitPair();
+        IsConduitValid = false;
     }
 
     public void AddValuePair(TypeValuePair typeValuePair)
     {
         ValuePair = typeValuePair;
+        IsValueValid = true;
     }
     public void AddConduitPair(TypeConduitPair typeConduitPair)
     {
         TypeConduitPair = typeConduitPair;
+        IsConduitValid = true;
+    }
+
+    public void InvalidateConduit()
+    {
+        IsConduitValid = false;
+        TypeConduitPair = new TypeConduitPair();
+    }
+    public void InvalidateValue()
+    {
+        IsValueValid = false;
+        ValuePair = new TypeValuePair();
     }
     
 }
@@ -85,22 +106,34 @@ public class SaveManager
 {
     private const string FileName = "SaveGame";
     private Dictionary<int, List<ConduitValuePair>> _gameStateObjects;
-    public static void Register(int id,  List<ConduitValuePair> typeObjectList)
+    public static void Register(int id,  List<TypeConduitPair> typeConduitPairs)
     {
         
         // TODO: map saved values to conduit values (one to one?)
         
         SaveManager self = SaveManagerSingleton.GetInstance();
-        if (!self._gameStateObjects.ContainsKey(id))
+        if (self._gameStateObjects[id].Count != typeConduitPairs.Count) //checks for variable updates/reregister updates
         {
-            self._gameStateObjects.Add(id, typeObjectList); 
+            self._gameStateObjects.Remove(id);
+        }
+        
+        if (!self._gameStateObjects.ContainsKey(id)) 
+        {
+            self._gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x))); 
         }
         else
         {
-            foreach (ConduitValuePair typeConduitValue in self._gameStateObjects[id])
+            for (int i = 0; i < typeConduitPairs.Count; i++)
             {
-                if (typeConduitValue.IsValueValid)
-                    typeConduitValue.Conduit.Set(typeConduitValue.Value);
+                TypeConduitPair typeConduitPair = typeConduitPairs[i];
+                ConduitValuePair conduitValuePair = self._gameStateObjects[id][i];
+                if (conduitValuePair.IsValueValid)
+                {
+                    bool successful = typeConduitPair.Conduit.SetVariable(conduitValuePair.ValuePair);
+                    if (!successful) conduitValuePair.AddValuePair(typeConduitPair.Conduit.GetVariable());
+                }
+                conduitValuePair.AddConduitPair(typeConduitPair);
+                self._gameStateObjects[id][i] = conduitValuePair;
             }
         }
     }
@@ -114,10 +147,9 @@ public class SaveManager
         {
             return new ObjectSaveData(id,
                 self._gameStateObjects[id].ConvertAll(
-                    x => new TypeValuePair(x.TypeConduitPair.Type, x.TypeConduitPair.Conduit.Get())
+                    x => new TypeValuePair(x.TypeConduitPair.Type, x.TypeConduitPair.Conduit.GetVariable()) //hash assigned here
                 )
             );
-
         });
         bool saveSuccess = SaveSystem.SaveGame(FileName, saveData, GameSecrets.SaveKey);
         if (!saveSuccess)
@@ -144,18 +176,18 @@ public class SaveManager
                 if(!self._gameStateObjects.TryAdd(objectSaveData.ID,
                     objectSaveData.TypeValuePairs.ConvertAll(x => new ConduitValuePair(x))
                     )
-                ){ //  if the object already exists, replace its value pair instead
-                    // this is unsafe, because it might try to assign a value to the wrong conduit
-                    // but we are helping to prevent corrupted data by checking the hash
-                    // if the order changes (which is what would need to happen for the above),
-                    // the hash should too, making the data invalid and preventing corruption
+                ){ 
+                    /* if the object already exists, replace its value pair instead
+                       this is unsafe, because it might try to assign a value to the wrong conduit
+                       but we are helping to prevent corrupted data by checking the hash
+                       if the order changes (which is what would need to happen for the above),
+                       the hash should too, making the data invalid and preventing corruption */
+                    
                     var conduits = self._gameStateObjects[objectSaveData.ID];
                     var data = objectSaveData.TypeValuePairs;
                     for(int index = 0; index < data.Count; index++)
                     {
-                        conduits[index].TypeConduitPair.Conduit.Set(
-                            Convert.ChangeType(data[index].Value, data[index].Type)
-                            );
+                        conduits[index].TypeConduitPair.Conduit.SetVariable(data[index]);
                         conduits[index].AddValuePair(data[index]);
                     }
                     self._gameStateObjects.Add(objectSaveData.ID, conduits);

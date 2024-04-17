@@ -14,8 +14,11 @@ public class Unit : MonoBehaviour, ISavable
         Health = startingHp;
         MaxHealth = maxHp;
         AttackDamage = attackDamage;
+        Conduit<string> t = new Conduit<string>(s => Name = s, () => Name);
     }
-
+    
+    
+    
     public string Name
     {
         get => unitName; 
