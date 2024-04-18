@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Debug = UnityEngine.Debug; //https://github.com/GabrielBigardi/Generic-Save-System/blob/main/DOCUMENTATION.md
 using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using Leguar.TotalJSON;
@@ -12,6 +13,7 @@ namespace IFSKSTR.SaveSystem
         private const string FileName = "SaveGame";
         private Dictionary<int, List<ConduitValuePair>> _gameStateObjects;
         private static SaveSystem _self;
+        public static ObjectIDGenerator _oidg = new ();
 
         private static void _setup()
         {
@@ -19,7 +21,7 @@ namespace IFSKSTR.SaveSystem
             {
                 _self = new SaveSystem
                 {
-                    _gameStateObjects = new Dictionary<int, List<ConduitValuePair>>()
+                    _gameStateObjects = new Dictionary<int, List<ConduitValuePair>>(), 
                 };
             }
         }
@@ -71,11 +73,22 @@ namespace IFSKSTR.SaveSystem
                     )
                 );
             });
-            for (int i = 0; i < saveData.Count; i++)
+            /*ObjectSaveData[] saveData = new ObjectSaveData[keys.Count];
+            bool firstTime = false;
+            for (int key = 0; key < keys.Count; key++)
             {
-                saveData[i].JsonSerialize(); //we can't use foreach because we need the function called on this value
-            }
-            ListWrapper<ObjectSaveData> wrapper = new ListWrapper<ObjectSaveData>(saveData);
+                var conduits = _self._gameStateObjects[keys[key]];
+                var tvp = new List<TypeValuePair>(conduits.Count);
+                for (int pair = 0; pair < conduits.Count; pair++)
+                {
+                    tvp.Add(conduits[pair].TypeConduitPair.Conduit.GetVariable());
+                    tvp[pair].JsonSerialize();
+                }
+                saveData[key] = new ObjectSaveData(keys[key], tvp);
+                saveData[key].JsonSerialize(); //we can't use foreach because we need the function called on this value
+            }*/
+            ListWrapper<ObjectSaveData> wrapper = new ListWrapper<ObjectSaveData>(saveData.ToList());
+            wrapper.JsonSerialize();
             bool saveSuccess = SaveSerializer.SaveGame(FileName, wrapper, GameSecrets.SaveKey);
             if (!saveSuccess)
             {
@@ -95,9 +108,9 @@ namespace IFSKSTR.SaveSystem
             
 
             _setup();
-            foreach (ObjectSaveData objectSaveData in wrapper.value)
+            wrapper.JsonDeserialize();
+            foreach (ObjectSaveData objectSaveData in wrapper.values)
             {
-                objectSaveData.JsonDeserialize();
                 if (objectSaveData.hash == objectSaveData.typeValuePairs.GetHashCode()) //is loaded data valid
                 {
                     if (!_self._gameStateObjects.TryAdd(objectSaveData.id,

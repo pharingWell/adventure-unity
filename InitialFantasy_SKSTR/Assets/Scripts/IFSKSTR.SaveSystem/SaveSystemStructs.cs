@@ -25,7 +25,7 @@ namespace IFSKSTR.SaveSystem
     Array of a fieldtype we can serialize
     List<T> of a fieldtype we can serialize
      */
-    public struct TypeConduitPair
+    public class TypeConduitPair
     {
         public Type Type;
         public Conduit<object> Conduit;
@@ -45,16 +45,16 @@ namespace IFSKSTR.SaveSystem
         
     }
 
-    public struct ConduitValuePair
+    public class ConduitValuePair
     {
         public TypeConduitPair TypeConduitPair { get; set; }
         public TypeValuePair ValuePair { get; set; }
         public bool IsValueValid;
         public bool IsConduitValid;
-
+        
         public ConduitValuePair(TypeConduitPair typeConduitPair)
         {
-            ValuePair = new TypeValuePair();
+            ValuePair = null;
             IsValueValid = false;
             
             TypeConduitPair = typeConduitPair;
@@ -65,7 +65,7 @@ namespace IFSKSTR.SaveSystem
             ValuePair = typeValuePair;
             IsValueValid = true;
             
-            TypeConduitPair = new TypeConduitPair();
+            TypeConduitPair = null;
             IsConduitValid = false;
         }
 
@@ -83,12 +83,12 @@ namespace IFSKSTR.SaveSystem
         public void InvalidateConduit()
         {
             IsConduitValid = false;
-            TypeConduitPair = new TypeConduitPair();
+            TypeConduitPair = null;
         }
         public void InvalidateValue()
         {
             IsValueValid = false;
-            ValuePair = new TypeValuePair();
+            ValuePair = null;
         }
 
         public override string ToString()
@@ -98,12 +98,13 @@ namespace IFSKSTR.SaveSystem
     }
 
     [Serializable]
-    public struct TypeValuePair : IJsonSerializable
+    public class TypeValuePair : IJsonSerializable
     {
         [SerializeField] private int type;
         [NonSerialized] public Type Type;
         [SerializeField] private string value;
         [NonSerialized] public IComparable Value;
+        public long id;
         private const string TypeKey = "type";
         private const string ValueKey = "value";
 
@@ -113,11 +114,13 @@ namespace IFSKSTR.SaveSystem
             Value = v;
             value = null;
             type = -1;
-            JsonSerialize();
+            id = 0;
+            bool b = false;
+            id = SaveSystem._oidg.GetId(this, out b);
         }
         public override string ToString()
         {
-            return "(type: " + Type + "(" + type + ") value: " + Value + "(" + value + "))";
+            return "["+id+"](type: " + Type + "(" + type + ") value: " + Value + "(" + value + "))";
         }
         
 
@@ -147,7 +150,7 @@ namespace IFSKSTR.SaveSystem
                 jValue = JSON.Serialize(Value);
             }
 
-            value = jValue.CreateString();
+            this.value = jValue.CreateString();
         }
         
         public void DeserializeValue()
@@ -155,6 +158,7 @@ namespace IFSKSTR.SaveSystem
             TypeCode typeCode = Type.GetTypeCode(Type);
             object obj;
             const string valueKey = "value";
+            Debug.Log(typeCode);
             JSON json = JSON.ParseString("{\""+valueKey+"\":" + value + "}");
             if (new[] {
                     TypeCode.SByte, TypeCode.Byte, TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32,
@@ -195,19 +199,22 @@ namespace IFSKSTR.SaveSystem
 
         private static Type GetType(int code)
         {
+            if (code == -1) code = 0;
             TypeCode tc = (TypeCode)code;
             return Type.GetType("System." + Enum.GetName(typeof(TypeCode), tc));
         }
 
         private static int GetTypeAsInt(Type type)
         {
-            return (int)Type.GetTypeCode(type);
+            TypeCode tc = Type.GetTypeCode(type);
+            return (int)tc;
         }
         
         public void JsonSerialize()
         {
             SerializeValue();
             type = GetTypeAsInt(Type);
+            Debug.Log("Serialized tvp "+id + " with type " + type  +" and data " + this);
         }
         public void JsonDeserialize()
         {
@@ -217,9 +224,10 @@ namespace IFSKSTR.SaveSystem
     }
 
     [Serializable]
-    public struct ObjectSaveData : IJsonSerializable //: ISerializationCallbackReceiver
+    public class ObjectSaveData : IJsonSerializable //: ISerializationCallbackReceiver
     {
         public int id;
+        public long long_id;
         public int hash;
         public List<TypeValuePair> typeValuePairs;
 
@@ -238,49 +246,51 @@ namespace IFSKSTR.SaveSystem
                 result += "(" + typeValue + "), ";
             }
 
-            return "(ID: " + id + ", Hash: " + hash + ", Values: " + result + ")";
+            return "["+long_id+"](ID: " + id + ", Hash: " + hash + ", Values: " + result + ")";
         }
 
         public void JsonSerialize()
         {
-            for (int i = 0; i < typeValuePairs.Count; i++)
+            foreach (var tvp in typeValuePairs)
             {
-                typeValuePairs[i].JsonSerialize();
+                tvp.JsonSerialize();
             }
+            hash = typeValuePairs.GetHashCode();
 
         }
 
         public void JsonDeserialize()
         {
-            for (int i = 0; i < typeValuePairs.Count; i++)
+            foreach (var tvp in typeValuePairs)
             {
-                typeValuePairs[i].JsonDeserialize();
+                tvp.JsonDeserialize();
             }
         }
-        /*public void OnBeforeSerialize()
-        {
-            int j = TypeValuePairs.Count;
-            valuesJson = new string[j];
-            for (int i = 0; i < TypeValuePairs.Count; i++)
-            {
-                valuesJson[i] = JsonUtility.ToJson(TypeValuePairs[i]);
-            }
-        }
-
-        public void OnAfterDeserialize()
-        {
-            TypeValuePairs = valuesJson.ToList().ConvertAll(JsonUtility.FromJson<TypeValuePair>);
-        }
-     }*/
     }
     
     [Serializable]
-    public struct ListWrapper<T>
+    public struct ListWrapper<T>: IJsonSerializable where T: IJsonSerializable
     {
-        public List<T> value;
-        public ListWrapper(List<T> value)
+        public List<T> values;
+        public ListWrapper(List<T> values)
         {
-            this.value = value;
+            this.values = values;
+        }
+
+        public void JsonSerialize()
+        {
+            foreach (var value in values)
+            {
+                value.JsonSerialize();
+            }
+        }
+
+        public void JsonDeserialize()
+        {
+            foreach (var value in values)
+            {
+                value.JsonDeserialize();
+            }
         }
     }
     
