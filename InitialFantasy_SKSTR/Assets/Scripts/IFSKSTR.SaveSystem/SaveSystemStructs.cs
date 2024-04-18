@@ -103,17 +103,17 @@ namespace IFSKSTR.SaveSystem
         [SerializeField] private int type;
         [NonSerialized] public Type Type;
         [SerializeField] private string value;
-        [NonSerialized] public object Value;
+        [NonSerialized] public IComparable Value;
         private const string TypeKey = "type";
         private const string ValueKey = "value";
 
-        public TypeValuePair(Type t, object v)
+        public TypeValuePair(Type t, IComparable v)
         {
             Type = t;
             Value = v;
             value = null;
             type = -1;
-            SerializeValue();
+            JsonSerialize();
         }
         public override string ToString()
         {
@@ -149,6 +149,49 @@ namespace IFSKSTR.SaveSystem
 
             value = jValue.CreateString();
         }
+        
+        public void DeserializeValue()
+        {
+            TypeCode typeCode = Type.GetTypeCode(Type);
+            object obj;
+            const string valueKey = "value";
+            JSON json = JSON.ParseString("{\""+valueKey+"\":" + value + "}");
+            if (new[] {
+                    TypeCode.SByte, TypeCode.Byte, TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32,
+                    TypeCode.Int64, TypeCode.UInt64, TypeCode.Single, TypeCode.Double, TypeCode.Decimal
+                }.Contains(typeCode)) //is a number
+            {
+                JNumber jNumber = json.GetJNumber(valueKey);
+                if (typeCode is TypeCode.Single or TypeCode.Double or TypeCode.Decimal)
+                {
+                    obj = jNumber.AsDouble();
+                }
+                else if(typeCode is TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64 )
+                {
+                    obj = jNumber.AsULong();
+                }
+                else
+                {
+                    obj = jNumber.AsLong();
+                }
+                
+            }
+            else if (new[] {TypeCode.Char, TypeCode.String, TypeCode.DateTime}.Contains(typeCode))
+            {
+                obj = json.GetString(ValueKey);
+            }else if (typeCode is TypeCode.Empty or TypeCode.DBNull)
+            {
+                obj = null;
+            }else if (typeCode is TypeCode.Boolean)
+            {
+                obj = json.GetBool(ValueKey);
+            }
+            else //is object
+            {
+                obj = json.Deserialize<object>();
+            }
+            Value = (IComparable)Convert.ChangeType(obj, Type);
+        }
 
         private static Type GetType(int code)
         {
@@ -169,8 +212,7 @@ namespace IFSKSTR.SaveSystem
         public void JsonDeserialize()
         {
             Type = GetType(type);
-            var val = JSON.ParseString(value).GetString(ValueKey);
-            Value = Convert.ChangeType(val, Type);
+            DeserializeValue();
         }
     }
 

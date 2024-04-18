@@ -35,7 +35,7 @@ namespace IFSKSTR.SaveSystem
         public TypeValuePair GetVariable()
         {
             T val = _get();
-            return new TypeValuePair(val.GetType(), val); //generates hash
+            return new TypeValuePair(val.GetType(), (IComparable)val); //generates hash
         }
     }
 

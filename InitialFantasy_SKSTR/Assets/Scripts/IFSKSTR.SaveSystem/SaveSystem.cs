@@ -50,9 +50,7 @@ namespace IFSKSTR.SaveSystem
                     if (conduitValuePair.IsValueValid)
                     {
                         bool successful = typeConduitPair.Conduit.SetVariable(conduitValuePair.ValuePair);
-                        if (!successful) conduitValuePair.AddValuePair(
-                            new TypeValuePair(typeConduitPair.Type, typeConduitPair.Conduit.GetVariable()
-                        ));
+                        if (!successful) conduitValuePair.AddValuePair(typeConduitPair.Conduit.GetVariable());
                     }
 
                     conduitValuePair.AddConduitPair(typeConduitPair);
