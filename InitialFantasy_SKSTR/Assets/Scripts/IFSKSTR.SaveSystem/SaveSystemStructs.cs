@@ -104,23 +104,26 @@ namespace IFSKSTR.SaveSystem
         [NonSerialized] public Type Type;
         [SerializeField] private string value;
         [NonSerialized] public IComparable Value;
-        public long id;
         private const string TypeKey = "type";
         private const string ValueKey = "value";
 
+        public TypeValuePair()
+        {
+            Type = null;
+            Value = null;
+            type = 0;
+            value = null;
+        }
         public TypeValuePair(Type t, IComparable v)
         {
+            type = 0;
+            value = null;
             Type = t;
             Value = v;
-            value = null;
-            type = -1;
-            id = 0;
-            bool b = false;
-            id = SaveSystem._oidg.GetId(this, out b);
         }
         public override string ToString()
         {
-            return "["+id+"](type: " + Type + "(" + type + ") value: " + Value + "(" + value + "))";
+            return "(type: " + Type + "(" + type + ") value: " + Value + "(" + value + "))";
         }
         
 
@@ -158,8 +161,15 @@ namespace IFSKSTR.SaveSystem
             TypeCode typeCode = Type.GetTypeCode(Type);
             object obj;
             const string valueKey = "value";
-            Debug.Log(typeCode);
-            JSON json = JSON.ParseString("{\""+valueKey+"\":" + value + "}");
+            JSON json;
+            if (value != null)
+            {
+                 json = JSON.ParseString("{\""+valueKey+"\":" + value + "}");
+            }
+            else
+            {
+                json = new JSON();
+            }
             if (new[] {
                     TypeCode.SByte, TypeCode.Byte, TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32,
                     TypeCode.Int64, TypeCode.UInt64, TypeCode.Single, TypeCode.Double, TypeCode.Decimal
@@ -214,7 +224,6 @@ namespace IFSKSTR.SaveSystem
         {
             SerializeValue();
             type = GetTypeAsInt(Type);
-            Debug.Log("Serialized tvp "+id + " with type " + type  +" and data " + this);
         }
         public void JsonDeserialize()
         {
@@ -226,11 +235,15 @@ namespace IFSKSTR.SaveSystem
     [Serializable]
     public class ObjectSaveData : IJsonSerializable //: ISerializationCallbackReceiver
     {
-        public int id;
-        public long long_id;
-        public int hash;
+        public int id;public int hash;
         public List<TypeValuePair> typeValuePairs;
 
+        public ObjectSaveData()
+        {
+            id = -1;
+            typeValuePairs = null;
+            hash = 0;
+        }
         public ObjectSaveData(int instanceID, List<TypeValuePair> valuePairs)
         {
             id = instanceID;
@@ -246,7 +259,7 @@ namespace IFSKSTR.SaveSystem
                 result += "(" + typeValue + "), ";
             }
 
-            return "["+long_id+"](ID: " + id + ", Hash: " + hash + ", Values: " + result + ")";
+            return "(ID: " + id + ", Hash: " + hash + ", Values: " + result + ")";
         }
 
         public void JsonSerialize()
@@ -256,6 +269,7 @@ namespace IFSKSTR.SaveSystem
                 tvp.JsonSerialize();
             }
             hash = typeValuePairs.GetHashCode();
+            Debug.Log(string.Join(",", typeValuePairs));
 
         }
 

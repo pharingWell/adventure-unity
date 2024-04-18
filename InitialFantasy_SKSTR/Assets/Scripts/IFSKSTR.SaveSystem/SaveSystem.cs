@@ -111,8 +111,8 @@ namespace IFSKSTR.SaveSystem
             wrapper.JsonDeserialize();
             foreach (ObjectSaveData objectSaveData in wrapper.values)
             {
-                if (objectSaveData.hash == objectSaveData.typeValuePairs.GetHashCode()) //is loaded data valid
-                {
+                // if (true ) //is loaded data valid || objectSaveData.hash == objectSaveData.typeValuePairs.GetHashCode()
+                // {
                     if (!_self._gameStateObjects.TryAdd(objectSaveData.id,
                             objectSaveData.typeValuePairs.ToList().ConvertAll(x => new ConduitValuePair(x))
                         )
@@ -134,11 +134,13 @@ namespace IFSKSTR.SaveSystem
 
                         _self._gameStateObjects.Add(objectSaveData.id, conduits);
                     }
-                }
-                else
-                {
-                    Debug.Log("Warning while loading: Failed to load with ID " + objectSaveData.id);
-                }
+                // }
+                // else
+                // {
+                //     Debug.Log("Warning while loading: Failed to load with ID " + objectSaveData.id);
+                //     Debug.Log(objectSaveData.hash +", "+objectSaveData.typeValuePairs.GetHashCode());
+                //     Debug.Log(string.Join(",", objectSaveData.typeValuePairs));
+                // }
             }
         }
     }
