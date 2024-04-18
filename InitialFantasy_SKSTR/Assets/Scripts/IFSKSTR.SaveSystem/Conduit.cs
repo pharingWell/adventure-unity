@@ -22,20 +22,20 @@ namespace IFSKSTR.SaveSystem
 
         public bool SetVariable(TypeValuePair typeValuePair)
         {
-            if (typeof(T) != typeValuePair.type)
+            if (typeof(T) != typeValuePair.Type)
             {
                 Debug.Log("ERROR: invalid type passed to Conduit.SetVariable, returned false");
                 return false;
             }
 
-            _set((T)Convert.ChangeType(typeValuePair.Value, typeValuePair.type));
+            _set((T)Convert.ChangeType(typeValuePair.Value, typeValuePair.Type));
             return true;
         }
 
         public TypeValuePair GetVariable()
         {
             T val = _get();
-            return new TypeValuePair(val.GetType(), val);
+            return new TypeValuePair(val.GetType(), val); //generates hash
         }
     }
 

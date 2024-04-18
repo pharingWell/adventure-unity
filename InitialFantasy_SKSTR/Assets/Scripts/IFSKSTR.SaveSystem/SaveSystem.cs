@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GBD.SaveManager;
 using Debug = UnityEngine.Debug; //https://github.com/GabrielBigardi/Generic-Save-System/blob/main/DOCUMENTATION.md
+using IFSKSTR.SaveSystem.GDB.SaveSerializer;
+using Leguar.TotalJSON;
 
 namespace IFSKSTR.SaveSystem
 {
@@ -25,7 +26,6 @@ namespace IFSKSTR.SaveSystem
 
         public static void Register(int id, List<TypeConduitPair> typeConduitPairs)
         {
-
             _setup();
             Debug.Log("Registered " + id);
             _self._gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x)));
@@ -50,7 +50,9 @@ namespace IFSKSTR.SaveSystem
                     if (conduitValuePair.IsValueValid)
                     {
                         bool successful = typeConduitPair.Conduit.SetVariable(conduitValuePair.ValuePair);
-                        if (!successful) conduitValuePair.AddValuePair(typeConduitPair.Conduit.GetVariable());
+                        if (!successful) conduitValuePair.AddValuePair(
+                            new TypeValuePair(typeConduitPair.Type, typeConduitPair.Conduit.GetVariable()
+                        ));
                     }
 
                     conduitValuePair.AddConduitPair(typeConduitPair);
@@ -61,15 +63,13 @@ namespace IFSKSTR.SaveSystem
 
         public static void Save()
         {
-
             _setup();
             List<int> keys = _self._gameStateObjects.Keys.ToList();
             List<ObjectSaveData> saveData = keys.ConvertAll(id =>
             {
                 return new ObjectSaveData(id,
                     _self._gameStateObjects[id].ConvertAll(
-                        x => new TypeValuePair(x.TypeConduitPair.Type,
-                            x.TypeConduitPair.Conduit.GetVariable()) //hash assigned here
+                        x =>  x.TypeConduitPair.Conduit.GetVariable() //hash assigned here
                     )
                 );
             });
@@ -81,7 +81,8 @@ namespace IFSKSTR.SaveSystem
             }
 
             Debug.Log("save data {" + s + "}");
-            bool saveSuccess = SaveManager.SaveGame(FileName, saveData, GameSecrets.SaveKey);
+            List<JSON> jsonList = saveData.ConvertAll(x => x.JsonSerialize());
+            bool saveSuccess = SaveSerializer.SaveGame(FileName, new JArray(jsonList.ToArray()), GameSecrets.SaveKey);
             if (!saveSuccess)
             {
                 Debug.Log("Error while saving");
@@ -91,7 +92,7 @@ namespace IFSKSTR.SaveSystem
 
         public static void Load()
         {
-            bool loadSuccess = SaveManager.LoadGame(FileName, out List<ObjectSaveData> saveData, GameSecrets.SaveKey);
+            bool loadSuccess = SaveSerializer.LoadGame(FileName, out List<ObjectSaveData> saveData, GameSecrets.SaveKey);
             if (!loadSuccess)
             {
                 Debug.Log("Error while loading");
@@ -101,10 +102,10 @@ namespace IFSKSTR.SaveSystem
             _setup();
             foreach (ObjectSaveData objectSaveData in saveData)
             {
-                if (objectSaveData.hash == objectSaveData.typeValuePairs.GetHashCode()) //is loaded data valid
+                if (objectSaveData.hash == objectSaveData.TypeValuePairs.GetHashCode()) //is loaded data valid
                 {
                     if (!_self._gameStateObjects.TryAdd(objectSaveData.id,
-                            objectSaveData.typeValuePairs.ConvertAll(x => new ConduitValuePair(x))
+                            objectSaveData.TypeValuePairs.ConvertAll(x => new ConduitValuePair(x))
                         )
                        )
                     {
@@ -115,7 +116,7 @@ namespace IFSKSTR.SaveSystem
                            the hash should too, making the data invalid and preventing corruption */
 
                         var conduits = _self._gameStateObjects[objectSaveData.id];
-                        var data = objectSaveData.typeValuePairs;
+                        var data = objectSaveData.TypeValuePairs;
                         for (int index = 0; index < data.Count; index++)
                         {
                             conduits[index].TypeConduitPair.Conduit.SetVariable(data[index]);
@@ -132,5 +133,4 @@ namespace IFSKSTR.SaveSystem
             }
         }
     }
-
 }

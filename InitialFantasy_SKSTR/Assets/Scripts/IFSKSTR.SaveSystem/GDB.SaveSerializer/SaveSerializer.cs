@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using GBD.SaveManager.EncryptionDecryptionUsingSymmetricKey;
+using Leguar.TotalJSON;
+using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using UnityEngine;
 
-namespace GBD.SaveManager
+namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
 {
-    public class SaveManager
+    public class SaveSerializer
     {
         public static event Action GameDataSaved;
         public static event Action<object> GameDataLoaded;
@@ -16,7 +18,6 @@ namespace GBD.SaveManager
         {
             string json = JsonUtility.ToJson(serializableObject);
             string encryptedJson = AesOperation.EncryptString(secretKey, json);
-
             string path = $"{Application.persistentDataPath}/{saveName}.json";
             File.WriteAllText(path, encryptedJson);
 
@@ -56,5 +57,5 @@ namespace GBD.SaveManager
             return true;
         }
     }
-
+    
 }

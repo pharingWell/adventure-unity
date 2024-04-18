@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace GBD.SaveManager.EncryptionDecryptionUsingSymmetricKey
+namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
 {
     public class AesOperation
     {

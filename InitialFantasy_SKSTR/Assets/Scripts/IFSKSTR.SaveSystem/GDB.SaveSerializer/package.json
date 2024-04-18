@@ -9,10 +9,6 @@
     "save",
     "system"
   ],
-  "author": {
-    "name": "Gabriel Bigardi",
-    "email": "gabrielbigardi@hotmail.com",
-    "url": "https://github.com/GabrielBigardi/"
-  },
+
   "type": "tool"
 }
