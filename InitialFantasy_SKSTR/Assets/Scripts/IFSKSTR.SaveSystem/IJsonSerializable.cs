@@ -3,11 +3,11 @@ using Leguar.TotalJSON;
 
 namespace IFSKSTR.SaveSystem
 {
-    public interface IJsonSerializable<T>
+    public interface IJsonSerializable
     {
-        public JSON JsonSerialize();
+        public void JsonSerialize();
 
-        public T JsonDeserialize(JSON json);
+        public void JsonDeserialize();
     }
 }
 

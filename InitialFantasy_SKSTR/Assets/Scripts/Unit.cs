@@ -27,6 +27,12 @@ public class Unit : MonoBehaviour
                 new (typeof(int), o => AttackDamage = (int)o, () => AttackDamage)
             }
         );
+        
+    }
+
+    public void Reset()
+    {
+        Health = MaxHealth;
     }
 
     public bool TakeDamage(int amount)

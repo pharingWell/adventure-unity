@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Leguar.TotalJSON;
 using IFSKSTR.SaveSystem.GDB.SaveSerializer;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
@@ -16,7 +17,8 @@ namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
 
         public static bool SaveGame<T>(string saveName, T serializableObject, string secretKey = DEFAULT_SECRET_KEY)
         {
-            string json = JsonUtility.ToJson(serializableObject);
+            string json = JSON.Serialize(serializableObject).CreateString();
+            Debug.Log(json);
             string encryptedJson = AesOperation.EncryptString(secretKey, json);
             string path = $"{Application.persistentDataPath}/{saveName}.json";
             File.WriteAllText(path, encryptedJson);
@@ -50,7 +52,7 @@ namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
             string json = File.ReadAllText(path);
             string decryptedJson = AesOperation.DecryptString(secretKey, json);
             Debug.Log(decryptedJson);
-            serializableObject = JsonUtility.FromJson<T>(decryptedJson);
+            serializableObject = JSON.ParseString(decryptedJson).Deserialize<T>();
 
             Debug.Log($"Loaded {loadName} successfully!");
             GameDataLoaded?.Invoke(serializableObject);

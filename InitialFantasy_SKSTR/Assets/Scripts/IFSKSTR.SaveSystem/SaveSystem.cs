@@ -73,16 +73,12 @@ namespace IFSKSTR.SaveSystem
                     )
                 );
             });
-
-            string s = "";
-            foreach (var data in saveData)
+            for (int i = 0; i < saveData.Count; i++)
             {
-                s += data + ", ";
+                saveData[i].JsonSerialize(); //we can't use foreach because we need the function called on this value
             }
-
-            Debug.Log("save data {" + s + "}");
-            List<JSON> jsonList = saveData.ConvertAll(x => x.JsonSerialize());
-            bool saveSuccess = SaveSerializer.SaveGame(FileName, new JArray(jsonList.ToArray()), GameSecrets.SaveKey);
+            ListWrapper<ObjectSaveData> wrapper = new ListWrapper<ObjectSaveData>(saveData);
+            bool saveSuccess = SaveSerializer.SaveGame(FileName, wrapper, GameSecrets.SaveKey);
             if (!saveSuccess)
             {
                 Debug.Log("Error while saving");
@@ -92,20 +88,22 @@ namespace IFSKSTR.SaveSystem
 
         public static void Load()
         {
-            bool loadSuccess = SaveSerializer.LoadGame(FileName, out List<ObjectSaveData> saveData, GameSecrets.SaveKey);
+            bool loadSuccess = SaveSerializer.LoadGame(FileName, out ListWrapper<ObjectSaveData> wrapper, GameSecrets.SaveKey);
             if (!loadSuccess)
             {
                 Debug.Log("Error while loading");
                 return;
             }
+            
 
             _setup();
-            foreach (ObjectSaveData objectSaveData in saveData)
+            foreach (ObjectSaveData objectSaveData in wrapper.value)
             {
-                if (objectSaveData.hash == objectSaveData.TypeValuePairs.GetHashCode()) //is loaded data valid
+                objectSaveData.JsonDeserialize();
+                if (objectSaveData.hash == objectSaveData.typeValuePairs.GetHashCode()) //is loaded data valid
                 {
                     if (!_self._gameStateObjects.TryAdd(objectSaveData.id,
-                            objectSaveData.TypeValuePairs.ConvertAll(x => new ConduitValuePair(x))
+                            objectSaveData.typeValuePairs.ToList().ConvertAll(x => new ConduitValuePair(x))
                         )
                        )
                     {
@@ -116,7 +114,7 @@ namespace IFSKSTR.SaveSystem
                            the hash should too, making the data invalid and preventing corruption */
 
                         var conduits = _self._gameStateObjects[objectSaveData.id];
-                        var data = objectSaveData.TypeValuePairs;
+                        var data = objectSaveData.typeValuePairs;
                         for (int index = 0; index < data.Count; index++)
                         {
                             conduits[index].TypeConduitPair.Conduit.SetVariable(data[index]);

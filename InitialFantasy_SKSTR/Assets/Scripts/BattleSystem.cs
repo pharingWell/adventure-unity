@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using IFSKSTR.SaveSystem;
+using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using UnityEngine.UIElements; // needed for TextMeshProUGUI to work
 
 // i used the tutorial from https://www.youtube.com/watch?v=_1pz_ohupPs
@@ -34,21 +35,36 @@ public class BattleSystem : MonoBehaviour
     void Start()
     {
         state = BattleState.START;
-        StartCoroutine(SetupBattle()); 
+        StartCoroutine(SetupBattle());
+        SaveSerializer.GameDataSaved += GameSaved;
+       // SaveSerializer.GameDataLoaded += GameLoaded;
     }
 
+    void GameSaved()
+    {
+        playerUnit.Health = 1;
+        SaveSystem.Load();
+    }
+    
+    void GameLoaded(object o)
+    {
+        
+    }
+    
     IEnumerator SetupBattle()  // the coroutine (glorified function that handles everything in a state)
     {
         // instantiate a player game object using the player prefab
         // spawn it on top of the player battle station
         GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
         playerUnit = playerGO.GetComponent<Unit>();
+        playerUnit.Reset();
 
         // instantiate an enemy game object using the enemy prefab
         // spawn it on top of the enemy battle station
         GameObject enemyGO = Instantiate(enemyPrefab, enemyBattleStation);
         enemyUnit = enemyGO.GetComponent<Unit>();
-
+        enemyUnit.Reset();
+        
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
         playerHUD.SetHUD(playerUnit);
@@ -56,7 +72,6 @@ public class BattleSystem : MonoBehaviour
         yield return new WaitForSeconds(2f); // need coroutines for this line
         SaveSystem.Save();
         state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
-        SaveSystem.Load();
         PlayerTurn();
     }
 

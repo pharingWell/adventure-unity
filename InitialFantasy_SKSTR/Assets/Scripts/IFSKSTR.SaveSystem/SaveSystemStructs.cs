@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Leguar.TotalJSON;
 using Unity.VisualScripting;
+using UnityEngine.Serialization;
 
 namespace IFSKSTR.SaveSystem
 {
@@ -19,7 +20,7 @@ namespace IFSKSTR.SaveSystem
 
     Custom non abstract classes with [Serializable] attribute.
     Custom structs with [Serializable] attribute. (new in Unity4.5)
-    References to objects that derive from UntiyEngine.Object
+    References to objects that derive from UnityEngine.Object
     Primitive data types (int,float,double,bool,string,etc)
     Array of a fieldtype we can serialize
     List<T> of a fieldtype we can serialize
@@ -96,10 +97,13 @@ namespace IFSKSTR.SaveSystem
         }
     }
 
-    public struct TypeValuePair : IJsonSerializable<TypeValuePair>
+    [Serializable]
+    public struct TypeValuePair : IJsonSerializable
     {
-        [SerializeField] public Type Type;
-        [SerializeField] public object Value;
+        [SerializeField] private int type;
+        [NonSerialized] public Type Type;
+        [SerializeField] private string value;
+        [NonSerialized] public object Value;
         private const string TypeKey = "type";
         private const string ValueKey = "value";
 
@@ -107,105 +111,135 @@ namespace IFSKSTR.SaveSystem
         {
             Type = t;
             Value = v;
+            value = null;
+            type = -1;
+            SerializeValue();
         }
-
         public override string ToString()
         {
-            return "(t: " + Type + " o: " + Value + ")";
+            return "(type: " + Type + "(" + type + ") value: " + Value + "(" + value + "))";
         }
         
 
-        public JSON JsonSerialize()
+        public void SerializeValue()
         {
-            int typeCode = (int)Type.GetTypeCode(Type);
+            TypeCode typeCode = Type.GetTypeCode(Type);
             JValue jValue;
-            if (new[] { 5, 7, 8, 9, 10, 11, 12, 13, 14, 15 }.Contains(typeCode)){ //is a number
+            if (new[] {
+                    TypeCode.SByte, TypeCode.Byte, TypeCode.Int16, TypeCode.UInt16, TypeCode.Int32, TypeCode.UInt32,
+                    TypeCode.Int64, TypeCode.UInt64, TypeCode.Single, TypeCode.Double, TypeCode.Decimal
+                }.Contains(typeCode)) //is a number
+            { 
                 string s = Value.ToString();
                 jValue = new JNumber(s);
             }
-            else if (new[] {4, 16, 18 }.Contains(typeCode)){
+            else if (new[] {TypeCode.Char, TypeCode.String, TypeCode.DateTime}.Contains(typeCode)){
                 jValue = new JString((string)Value);
-            }else if (typeCode is 0 or 2)
+            }else if (typeCode is TypeCode.Empty or TypeCode.DBNull)
             {
                 jValue = new JNull();
-            }else if (typeCode is 3)
+            }else if (typeCode is TypeCode.Boolean)
             {
                 jValue = new JBoolean((bool)Value);
             }
-            else
+            else //is object
             {
                 jValue = JSON.Serialize(Value);
             }
-            return new JSON(new Dictionary<string, JValue>()
-            {
-                {TypeKey, new JNumber((int)Type.GetTypeCode(Type))},
-                {ValueKey, jValue}
-            });
+
+            value = jValue.CreateString();
         }
 
-        private static Type GetType(TypeCode code)
-        {         
-            return Type.GetType("System." + Enum.GetName(typeof(TypeCode), code));
-        }
-
-        public TypeValuePair JsonDeserialize(JSON json)
+        private static Type GetType(int code)
         {
-            Type type = GetType((TypeCode)json.GetInt(TypeKey));
-            object value = json.GetJSON(ValueKey).Deserialize<object>();
-            return new TypeValuePair(type, value);
+            TypeCode tc = (TypeCode)code;
+            return Type.GetType("System." + Enum.GetName(typeof(TypeCode), tc));
+        }
+
+        private static int GetTypeAsInt(Type type)
+        {
+            return (int)Type.GetTypeCode(type);
+        }
+        
+        public void JsonSerialize()
+        {
+            SerializeValue();
+            type = GetTypeAsInt(Type);
+        }
+        public void JsonDeserialize()
+        {
+            Type = GetType(type);
+            var val = JSON.ParseString(value).GetString(ValueKey);
+            Value = Convert.ChangeType(val, Type);
         }
     }
 
     [Serializable]
-    public struct ObjectSaveData: IJsonSerializable<ObjectSaveData>
+    public struct ObjectSaveData : IJsonSerializable //: ISerializationCallbackReceiver
     {
-        [SerializeField] public int id;
-        [SerializeField] public int hash;
-        [SerializeField] public List<TypeValuePair> TypeValuePairs;
-        private const string IDKey = "id"; 
-        private const string HashKey = "hash"; 
-        private const string ValuesKey = "values";     
-        public ObjectSaveData(int id, List<TypeValuePair> typeValuePairs)
+        public int id;
+        public int hash;
+        public List<TypeValuePair> typeValuePairs;
+
+        public ObjectSaveData(int instanceID, List<TypeValuePair> valuePairs)
         {
-            this.id = id;
-            TypeValuePairs = typeValuePairs;
+            id = instanceID;
+            typeValuePairs = valuePairs;
             hash = typeValuePairs.GetHashCode();
         }
 
         public override string ToString()
         {
             string result = "";
-            foreach (var typeValue in TypeValuePairs)
+            foreach (var typeValue in typeValuePairs)
             {
                 result += "(" + typeValue + "), ";
             }
+
             return "(ID: " + id + ", Hash: " + hash + ", Values: " + result + ")";
         }
 
-        public JSON JsonSerialize()
+        public void JsonSerialize()
         {
-            return new JSON(new Dictionary<string, JValue>{
-                    {IDKey, new JNumber(id)},
-                    {HashKey, new JNumber(hash)},
-                    {ValuesKey, new JArray(TypeValuePairs.ConvertAll(x => x.JsonSerialize()).ToArray()) }
-                }
-            );
-        }
-
-        public ObjectSaveData JsonDeserialize(JSON json)
-        {
-            int localID = json.GetInt(IDKey);
-            int localHash = json.GetInt(HashKey);
-            List<JSON> jsonList = json.GetJArray(ValuesKey).AsJSONArray().ToList();
-            List<TypeValuePair> valueList = jsonList.ConvertAll<TypeValuePair>(x => new TypeValuePair().JsonDeserialize(x));
-            if (localHash != valueList.GetHashCode())
+            for (int i = 0; i < typeValuePairs.Count; i++)
             {
-                Debug.Log(localHash  + " != " + valueList.GetHashCode());
-                return new ObjectSaveData();
+                typeValuePairs[i].JsonSerialize();
             }
 
-            return new ObjectSaveData(localID, valueList);
+        }
+
+        public void JsonDeserialize()
+        {
+            for (int i = 0; i < typeValuePairs.Count; i++)
+            {
+                typeValuePairs[i].JsonDeserialize();
+            }
+        }
+        /*public void OnBeforeSerialize()
+        {
+            int j = TypeValuePairs.Count;
+            valuesJson = new string[j];
+            for (int i = 0; i < TypeValuePairs.Count; i++)
+            {
+                valuesJson[i] = JsonUtility.ToJson(TypeValuePairs[i]);
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            TypeValuePairs = valuesJson.ToList().ConvertAll(JsonUtility.FromJson<TypeValuePair>);
+        }
+     }*/
+    }
+    
+    [Serializable]
+    public struct ListWrapper<T>
+    {
+        public List<T> value;
+        public ListWrapper(List<T> value)
+        {
+            this.value = value;
         }
     }
-
+    
 }
