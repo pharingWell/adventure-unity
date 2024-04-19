@@ -28,36 +28,40 @@ namespace IFSKSTR.SaveSystem
     public class TypeConduitPair
     {
         public Type Type;
-        public Conduit<object> Conduit;
+        public Conduit<IComparable> Conduit;
         
         
-        public TypeConduitPair(Type t, Conduit<object> value)
+        public TypeConduitPair(Type t, Conduit<IComparable> value)
         {
             Type = t;
             Conduit = value;
         }
 
-        public TypeConduitPair(Type t, Action<object> set, Func<object> get)
+        public TypeConduitPair(Type t, Action<IComparable> set, Func<IComparable> get)
         {
             Type = t;
-            Conduit = new Conduit<object>(set, get);
+            Conduit = new Conduit<IComparable>(set, get);
         }
-        
+
+        public override string ToString()
+        {
+            return "(" + Type + ", " + Conduit + ")";
+        }
     }
 
     public class ConduitValuePair
     {
-        public TypeConduitPair TypeConduitPair { get; set; }
+        public TypeConduitPair ConduitPair { get; set; }
         public TypeValuePair ValuePair { get; set; }
         public bool IsValueValid;
         public bool IsConduitValid;
         
-        public ConduitValuePair(TypeConduitPair typeConduitPair)
+        public ConduitValuePair(TypeConduitPair conduitPair)
         {
             ValuePair = null;
             IsValueValid = false;
             
-            TypeConduitPair = typeConduitPair;
+            ConduitPair = conduitPair;
             IsConduitValid = true;
         }
         public ConduitValuePair(TypeValuePair typeValuePair)
@@ -65,7 +69,7 @@ namespace IFSKSTR.SaveSystem
             ValuePair = typeValuePair;
             IsValueValid = true;
             
-            TypeConduitPair = null;
+            ConduitPair = null;
             IsConduitValid = false;
         }
 
@@ -76,14 +80,15 @@ namespace IFSKSTR.SaveSystem
         }
         public void AddConduitPair(TypeConduitPair typeConduitPair)
         {
-            TypeConduitPair = typeConduitPair;
+            ConduitPair = typeConduitPair;
             IsConduitValid = true;
         }
-
+        
+        
         public void InvalidateConduit()
         {
             IsConduitValid = false;
-            TypeConduitPair = null;
+            ConduitPair = null;
         }
         public void InvalidateValue()
         {
@@ -93,7 +98,10 @@ namespace IFSKSTR.SaveSystem
 
         public override string ToString()
         {
-            return TypeConduitPair + ", " + TypeConduitPair;
+            string s = "";
+            if (IsConduitValid) s += "conduit: " + ConduitPair + ", ";
+            if (IsValueValid) s += "value:" + ValuePair;
+            return "["+ s + "]";
         }
     }
 
@@ -235,18 +243,19 @@ namespace IFSKSTR.SaveSystem
     [Serializable]
     public class ObjectSaveData : IJsonSerializable //: ISerializationCallbackReceiver
     {
-        public int id;public int hash;
+        public string id;
+        public int hash;
         public List<TypeValuePair> typeValuePairs;
 
         public ObjectSaveData()
         {
-            id = -1;
+            id = null;
             typeValuePairs = null;
             hash = 0;
         }
-        public ObjectSaveData(int instanceID, List<TypeValuePair> valuePairs)
+        public ObjectSaveData(string objectIdentifier, List<TypeValuePair> valuePairs)
         {
-            id = instanceID;
+            id = objectIdentifier;
             typeValuePairs = valuePairs;
             hash = typeValuePairs.GetHashCode();
         }
@@ -269,7 +278,7 @@ namespace IFSKSTR.SaveSystem
                 tvp.JsonSerialize();
             }
             hash = typeValuePairs.GetHashCode();
-            Debug.Log(string.Join(",", typeValuePairs));
+            //Debug.Log(string.Join(",", typeValuePairs));
 
         }
 

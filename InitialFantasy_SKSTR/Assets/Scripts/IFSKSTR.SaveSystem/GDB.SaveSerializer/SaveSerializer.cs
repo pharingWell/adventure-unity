@@ -11,14 +11,13 @@ namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
     public class SaveSerializer
     {
         public static event Action GameDataSaved;
-        public static event Action<object> GameDataLoaded;
+        public static event Action GameDataLoaded;
 
         public const string DEFAULT_SECRET_KEY = "b14ca5898a4e4133bbce2ea2315a1916";
 
         public static bool SaveGame<T>(string saveName, T serializableObject, string secretKey = DEFAULT_SECRET_KEY)
         {
             string json = JSON.Serialize(serializableObject).CreateString();
-            Debug.Log(json);
             string encryptedJson = AesOperation.EncryptString(secretKey, json);
             string path = $"{Application.persistentDataPath}/{saveName}.json";
             File.WriteAllText(path, encryptedJson);
@@ -53,10 +52,14 @@ namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
             string decryptedJson = AesOperation.DecryptString(secretKey, json);
             Debug.Log(decryptedJson);
             serializableObject = JSON.ParseString(decryptedJson).Deserialize<T>();
-
             Debug.Log($"Loaded {loadName} successfully!");
-            GameDataLoaded?.Invoke(serializableObject);
             return true;
+        }
+
+        public static void Invoke()
+        {
+            
+            GameDataLoaded?.Invoke();
         }
     }
     

@@ -2,24 +2,26 @@ using System;
 using System.Collections.Generic;
 using IFSKSTR.SaveSystem;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Unit : MonoBehaviour
 {
     [SerializeField] private string unitName;
-    public string Name { get => unitName; set => unitName = Name; }
+    public string Name { get => unitName; set => unitName = value; }
     [SerializeField] private int level;
-    public int Level { get => level; set => level = Level; }
+    public int Level { get => level; set => level = value; }
     private int _health;
-    public int Health { get => _health; set => _health = Health; }
+    public int Health { get => _health; set => _health = value; }
     [SerializeField] private int maxHealth;
-    public int MaxHealth { get => maxHealth; set => maxHealth = MaxHealth; }
+    public int MaxHealth { get => maxHealth; set => maxHealth = value; }
     [SerializeField] private int attackDamage;
-    public int AttackDamage { get => attackDamage; set => attackDamage = AttackDamage; }
+    public int AttackDamage { get => attackDamage; set => attackDamage = value; }
 
     private void Start()
     {
-        SaveSystem.Register(GetInstanceID(),    
-            new List<TypeConduitPair>{
+        //nameof()
+        SaveSystem.Register(gameObject, new List<TypeConduitPair>{
+                 
                 new(typeof(string), o => Name = (string)o, () => Name),
                 new (typeof(int), o => Level = (int)o, () => Level),
                 new (typeof(int), o => Health = (int)o, () => Health),

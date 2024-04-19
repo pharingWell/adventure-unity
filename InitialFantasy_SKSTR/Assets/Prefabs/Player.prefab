@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitName: Hero
-  level: 3
+  level: 1
+  health: 1
   maxHealth: 10
   attackDamage: 3

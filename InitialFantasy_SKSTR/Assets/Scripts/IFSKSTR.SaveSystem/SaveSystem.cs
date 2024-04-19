@@ -5,94 +5,79 @@ using System.Runtime.Serialization;
 using Debug = UnityEngine.Debug; //https://github.com/GabrielBigardi/Generic-Save-System/blob/main/DOCUMENTATION.md
 using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using Leguar.TotalJSON;
+using UnityEngine;
+using Object = System.Object;
 
 namespace IFSKSTR.SaveSystem
 {
     public class SaveSystem
     {
         private const string FileName = "SaveGame";
-        private Dictionary<int, List<ConduitValuePair>> _gameStateObjects;
-        private static SaveSystem _self;
-        public static ObjectIDGenerator _oidg = new ();
+        private static Dictionary<string, List<ConduitValuePair>> _gameStateObjects = new ();
+        private static Dictionary<string, int> _registeredGameObjects = new ();
 
-        private static void _setup()
+        public static void Register(GameObject registeredGameObject, List<TypeConduitPair> typeConduitPairs)
         {
-            if (_self is null)
+            if (!_registeredGameObjects.TryAdd(registeredGameObject.name, 0))
             {
-                _self = new SaveSystem
-                {
-                    _gameStateObjects = new Dictionary<int, List<ConduitValuePair>>(), 
-                };
+                _registeredGameObjects[registeredGameObject.name] += 1;
             }
-        }
-
-        public static void Register(int id, List<TypeConduitPair> typeConduitPairs)
-        {
-            _setup();
+            string id = registeredGameObject.name + "_" + _registeredGameObjects[registeredGameObject.name];
             Debug.Log("Registered " + id);
-            _self._gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x)));
-            if (!_self._gameStateObjects.ContainsKey(id))
+            if (!_gameStateObjects.ContainsKey(id))
             {
-                _self._gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x)));
+                _gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x)));
             }
             else
             {
-                if (_self._gameStateObjects[id].Count !=
-                    typeConduitPairs.Count) //checks for variable updates/reregister updates
+                
+               Debug.Log("Object with id \"" +id+"\" loaded from memory");
+               LoadDataOnRegister(id, typeConduitPairs);
+            }
+        }
+
+        private static void LoadDataOnRegister(string id, List<TypeConduitPair> typeConduitPairs)
+        {
+            if (_gameStateObjects[id].Count !=
+                typeConduitPairs.Count) //checks for variable updates/reregister updates
+            {
+                _gameStateObjects.Remove(id);
+                _gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x)));
+                return;
+            }
+            
+            for (int index = 0; index < typeConduitPairs.Count; index++)
+            {
+                TypeConduitPair typeConduitPair = typeConduitPairs[index];
+                ConduitValuePair conduitValuePair = _gameStateObjects[id][index];
+                if (conduitValuePair.IsValueValid)
                 {
-                    _self._gameStateObjects.Remove(id);
-                    _self._gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x)));
-                    return;
+                    typeConduitPair.Conduit.SetVariable(conduitValuePair.ValuePair);
+                    //if (!successful) conduitValuePair.AddValuePair(typeConduitPair.Conduit.GetVariable());
                 }
 
-                for (int i = 0; i < typeConduitPairs.Count; i++)
-                {
-                    TypeConduitPair typeConduitPair = typeConduitPairs[i];
-                    ConduitValuePair conduitValuePair = _self._gameStateObjects[id][i];
-                    if (conduitValuePair.IsValueValid)
-                    {
-                        bool successful = typeConduitPair.Conduit.SetVariable(conduitValuePair.ValuePair);
-                        if (!successful) conduitValuePair.AddValuePair(typeConduitPair.Conduit.GetVariable());
-                    }
-
-                    conduitValuePair.AddConduitPair(typeConduitPair);
-                    _self._gameStateObjects[id][i] = conduitValuePair;
-                }
+                conduitValuePair.AddConduitPair(typeConduitPair);
+                _gameStateObjects[id][index] = conduitValuePair;
             }
         }
 
         public static void Save()
         {
-            _setup();
-            List<int> keys = _self._gameStateObjects.Keys.ToList();
+            List<string> keys = _gameStateObjects.Keys.ToList();
             List<ObjectSaveData> saveData = keys.ConvertAll(id =>
             {
                 return new ObjectSaveData(id,
-                    _self._gameStateObjects[id].ConvertAll(
-                        x =>  x.TypeConduitPair.Conduit.GetVariable() //hash assigned here
+                    _gameStateObjects[id].ConvertAll(
+                        x =>  x.ConduitPair.Conduit.GetVariable() //hash assigned here
                     )
                 );
             });
-            /*ObjectSaveData[] saveData = new ObjectSaveData[keys.Count];
-            bool firstTime = false;
-            for (int key = 0; key < keys.Count; key++)
-            {
-                var conduits = _self._gameStateObjects[keys[key]];
-                var tvp = new List<TypeValuePair>(conduits.Count);
-                for (int pair = 0; pair < conduits.Count; pair++)
-                {
-                    tvp.Add(conduits[pair].TypeConduitPair.Conduit.GetVariable());
-                    tvp[pair].JsonSerialize();
-                }
-                saveData[key] = new ObjectSaveData(keys[key], tvp);
-                saveData[key].JsonSerialize(); //we can't use foreach because we need the function called on this value
-            }*/
             ListWrapper<ObjectSaveData> wrapper = new ListWrapper<ObjectSaveData>(saveData.ToList());
             wrapper.JsonSerialize();
             bool saveSuccess = SaveSerializer.SaveGame(FileName, wrapper, GameSecrets.SaveKey);
             if (!saveSuccess)
             {
-                Debug.Log("Error while saving");
+                Debug.LogError("Error while saving");
                 return;
             }
         }
@@ -102,46 +87,20 @@ namespace IFSKSTR.SaveSystem
             bool loadSuccess = SaveSerializer.LoadGame(FileName, out ListWrapper<ObjectSaveData> wrapper, GameSecrets.SaveKey);
             if (!loadSuccess)
             {
-                Debug.Log("Error while loading");
+                Debug.LogError("Error while loading");
                 return;
             }
-            
-
-            _setup();
+            _registeredGameObjects = new Dictionary<string, int>();
+            _gameStateObjects = new Dictionary<string, List<ConduitValuePair>>();
             wrapper.JsonDeserialize();
             foreach (ObjectSaveData objectSaveData in wrapper.values)
             {
-                // if (true ) //is loaded data valid || objectSaveData.hash == objectSaveData.typeValuePairs.GetHashCode()
-                // {
-                    if (!_self._gameStateObjects.TryAdd(objectSaveData.id,
-                            objectSaveData.typeValuePairs.ToList().ConvertAll(x => new ConduitValuePair(x))
-                        )
-                       )
-                    {
-                        /* if the object already exists, replace its value pair instead
-                           this is unsafe, because it might try to assign a value to the wrong conduit
-                           but we are helping to prevent corrupted data by checking the hash
-                           if the order changes (which is what would need to happen for the above),
-                           the hash should too, making the data invalid and preventing corruption */
-
-                        var conduits = _self._gameStateObjects[objectSaveData.id];
-                        var data = objectSaveData.typeValuePairs;
-                        for (int index = 0; index < data.Count; index++)
-                        {
-                            conduits[index].TypeConduitPair.Conduit.SetVariable(data[index]);
-                            conduits[index].AddValuePair(data[index]);
-                        }
-
-                        _self._gameStateObjects.Add(objectSaveData.id, conduits);
-                    }
-                // }
-                // else
-                // {
-                //     Debug.Log("Warning while loading: Failed to load with ID " + objectSaveData.id);
-                //     Debug.Log(objectSaveData.hash +", "+objectSaveData.typeValuePairs.GetHashCode());
-                //     Debug.Log(string.Join(",", objectSaveData.typeValuePairs));
-                // }
+                _gameStateObjects.Add(
+                    objectSaveData.id,
+                    objectSaveData.typeValuePairs.ConvertAll(x => new ConduitValuePair(x))
+                );
             }
+            SaveSerializer.Invoke();
         }
     }
 }

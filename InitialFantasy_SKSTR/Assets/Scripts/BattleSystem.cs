@@ -20,6 +20,9 @@ public class BattleSystem : MonoBehaviour
     public Transform playerBattleStation;
     public Transform enemyBattleStation;
 
+    private bool loaded;
+    private GameObject playerGo;
+    private GameObject enemyGo;
     Unit playerUnit;
     Unit enemyUnit;
 
@@ -37,40 +40,55 @@ public class BattleSystem : MonoBehaviour
         state = BattleState.START;
         StartCoroutine(SetupBattle());
         SaveSerializer.GameDataSaved += GameSaved;
-       // SaveSerializer.GameDataLoaded += GameLoaded;
+        SaveSerializer.GameDataLoaded += GameLoaded;
+    }
+    
+    IEnumerator WaitEnumerator(float duration)
+    {
+        yield return new WaitForSeconds(duration);
     }
 
+    void Wait(float duration)
+    {
+        
+        StartCoroutine(WaitEnumerator(duration));
+    }
+    
     void GameSaved()
     {
         playerUnit.Health = 1;
+        Destroy(enemyGo);
+        Destroy(enemyUnit);
+        Destroy(playerGo);
+        Destroy(playerUnit);
         SaveSystem.Load();
     }
     
-    void GameLoaded(object o)
+    void GameLoaded()
     {
-        
+        Setup();
+    }
+
+    void Setup()
+    {
+        playerGo = Instantiate(playerPrefab, playerBattleStation);
+        playerUnit = playerGo.GetComponent<Unit>();
+        // instantiate an enemy game object using the enemy prefab
+        // spawn it on top of the enemy battle station
+        enemyGo = Instantiate(enemyPrefab, enemyBattleStation);
+        enemyUnit = enemyGo.GetComponent<Unit>();
+        // changes the dialogue text to include the enemy's name
+        dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
+        playerHUD.SetHUD(playerUnit);
+        enemyHUD.SetHUD(enemyUnit);
     }
     
     IEnumerator SetupBattle()  // the coroutine (glorified function that handles everything in a state)
     {
-        // instantiate a player game object using the player prefab
-        // spawn it on top of the player battle station
-        GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
-        playerUnit = playerGO.GetComponent<Unit>();
-        playerUnit.Reset();
-
-        // instantiate an enemy game object using the enemy prefab
-        // spawn it on top of the enemy battle station
-        GameObject enemyGO = Instantiate(enemyPrefab, enemyBattleStation);
-        enemyUnit = enemyGO.GetComponent<Unit>();
-        enemyUnit.Reset();
-        
-        // changes the dialogue text to include the enemy's name
-        dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
-        playerHUD.SetHUD(playerUnit);
-        enemyHUD.SetHUD(enemyUnit); 
+        Setup();
         yield return new WaitForSeconds(1f); // need coroutines for this line
-        SaveSystem.Save();
+        GameSaved();
+        yield return new WaitForSeconds(5f);
         state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
         PlayerTurn();
     }
