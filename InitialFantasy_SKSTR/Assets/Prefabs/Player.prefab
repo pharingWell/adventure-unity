@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: 932104875, guid: 96742d3571668f54b95cf08362b35a00, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
@@ -115,7 +115,8 @@ Animation:
   m_Enabled: 1
   serializedVersion: 3
   m_Animation: {fileID: 7400000, guid: b27b2de8e42b6ca4bb60b38839293fb2, type: 2}
-  m_Animations: []
+  m_Animations:
+  - {fileID: 7400000, guid: b27b2de8e42b6ca4bb60b38839293fb2, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
