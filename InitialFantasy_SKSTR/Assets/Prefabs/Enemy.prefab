@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6549201546249206296}
   - component: {fileID: 9160924502261442934}
   - component: {fileID: 1321217889114464067}
+  - component: {fileID: -1938399984727604558}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -74,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1619603171, guid: bd0bdd9d67dc4aa44ac9bc4eea0feb04, type: 3}
+  m_Sprite: {fileID: 1932223395, guid: bd0bdd9d67dc4aa44ac9bc4eea0feb04, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -104,3 +105,18 @@ MonoBehaviour:
   attackDamage: 3
   currentHp: 20
   maxHp: 20
+--- !u!111 &-1938399984727604558
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924293423347811125}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 0aa83edd94634174ca7f55c1525c098a, type: 2}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0

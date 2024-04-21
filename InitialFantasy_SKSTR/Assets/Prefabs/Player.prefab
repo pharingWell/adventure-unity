@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2508392295160547979}
   - component: {fileID: 8228473061504285900}
   - component: {fileID: 7784718863016764631}
+  - component: {fileID: -9092012028683860291}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -74,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 108641020, guid: 28e57a56c7ff12048b915bacc7df5098, type: 3}
+  m_Sprite: {fileID: 932104875, guid: 96742d3571668f54b95cf08362b35a00, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -104,3 +105,18 @@ MonoBehaviour:
   attackDamage: 4
   currentHp: 15
   maxHp: 15
+--- !u!111 &-9092012028683860291
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4474980528357910163}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: b27b2de8e42b6ca4bb60b38839293fb2, type: 2}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
