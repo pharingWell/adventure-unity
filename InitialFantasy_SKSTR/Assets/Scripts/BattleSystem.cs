@@ -24,10 +24,10 @@ public class BattleSystem : MonoBehaviour
     Unit enemyUnit;
 
     public TextMeshProUGUI dialogueText; // use TextMeshProUGUI for hud
-
     public BattleHUD playerHUD;
     public BattleHUD enemyHUD;
-
+    public GameObject actions;
+    
     public BattleState state;
 
     // Start is called before the first frame update
@@ -39,6 +39,7 @@ public class BattleSystem : MonoBehaviour
 
     IEnumerator SetupBattle()  // the coroutine (glorified funtion that handles everything in a state)
     {
+        actions.SetActive(false);
         // instantiate a player game object using the player prefab
         // spawn it on top of the player battle station
         GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
@@ -90,6 +91,7 @@ public class BattleSystem : MonoBehaviour
     void PlayerTurn() 
     {
         dialogueText.text = "Choose an action:";
+        actions.SetActive(true);
     }
 
      IEnumerator PlayerAttack()
@@ -168,9 +170,9 @@ public class BattleSystem : MonoBehaviour
 
     public void OnAttackButton() // player clicks attack button
     {
-        if (state != BattleState.PLAYERTURN) 
+        if (state != BattleState.PLAYERTURN)
             return;
-
+        actions.SetActive(false);
         StartCoroutine(PlayerAttack());
     }
 
@@ -178,7 +180,7 @@ public class BattleSystem : MonoBehaviour
     {
         if (state != BattleState.PLAYERTURN) 
             return;
-
+        actions.SetActive(false);
         StartCoroutine(PlayerHeal());
     }
 

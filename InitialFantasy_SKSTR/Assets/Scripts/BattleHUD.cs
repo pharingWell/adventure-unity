@@ -11,6 +11,7 @@ public class BattleHUD : MonoBehaviour
 {
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI levelText;
+
     public TextMeshProUGUI hpText; // also want hp displayed
     public Slider hpSlider;
 
@@ -27,4 +28,5 @@ public class BattleHUD : MonoBehaviour
         hpSlider.value = hp;
         hpText.text = "HP " + hp; // update HP text
     }
+    
 }
