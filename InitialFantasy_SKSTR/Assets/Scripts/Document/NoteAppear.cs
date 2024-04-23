@@ -4,6 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/* REFERENCE:
+Title: “Unity3D: Create a Note Appear System” [YouTube Video]
+Author: Kyle Broad
+Date: October, 19th, 2020
+URL: https://youtube.com/watch?v=eVre2i6gPF0 
+Publisher: YouTube
+Used for: Document System (Scripts: NoteAppear) 
+*/
 public class NoteAppear : MonoBehaviour
 {
     [SerializeField]
