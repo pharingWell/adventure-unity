@@ -14,13 +14,14 @@ public class DialogueManager: MonoBehaviour
     public Animator animator;
 
 	private Queue<string> sentences;
+	public Dialogue dialogue;
 
 	// Use this for initialization
 	void Start () {
 		sentences = new Queue<string>();
 	}
 
-	public void StartDialogue (Dialogue dialogue)
+	public void StartDialogue ()
 	{
 		animator.SetBool("IsOpen", true);
 
