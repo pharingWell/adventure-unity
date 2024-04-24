@@ -9,32 +9,34 @@ using Object = UnityEngine.Object;
 
 namespace IFSKSTR.SaveSystem
 {
-    public class Conduit<T> where T: IComparable 
+    public class Conduit
     {
+        public delegate object Get();
+        public delegate void Set(object value);
+        private readonly Get _get;
+        private readonly Set _set;
         
-        private readonly Action<IComparable> _set;
-        private readonly Func<IComparable> _get;
-        
-        public Conduit(Action<IComparable> set, Func<IComparable> get)
+        public Conduit(in Get  get, in Set set)
         {
-            _set = set;
             _get = get;
+            _set = set;
         }
         
         public void SetVariable(TypeValuePair typeValuePair)
         {
-            _set((IComparable)Convert.ChangeType(typeValuePair.Value, typeValuePair.Type));
+            _set(Convert.ChangeType(typeValuePair.Value, typeValuePair.Type));
         }
 
         public TypeValuePair GetVariable()
         {
-            IComparable val = _get();
+            object val = _get();
             return new TypeValuePair(val.GetType(), val); //generates hash
         }
-
+        
         public override string ToString()
         {
-            return "(" + typeof(T) + ": " + _get() + ")";
+            object val = _get();
+            return "(" + val.GetType()  + ": " + val + ")";
         }
     }
 

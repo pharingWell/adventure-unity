@@ -1,37 +1,46 @@
 using System;
 using System.Collections.Generic;
 using IFSKSTR.SaveSystem;
+using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Unit : MonoBehaviour
+public class Unit : MonoBehaviour, ISavable
 {
     [SerializeField] private string unitName;
     public string Name { get => unitName; set => unitName = value; }
     [SerializeField] private int level;
+    [Author]
     public int Level { get => level; set => level = value; }
+    [Author]
     private int _health;
     public int Health { get => _health; set => _health = value; }
     [SerializeField] private int maxHealth;
     public int MaxHealth { get => maxHealth; set => maxHealth = value; }
     [SerializeField] private int attackDamage;
     public int AttackDamage { get => attackDamage; set => attackDamage = value; }
-
     private void Start()
     {
-        //nameof()
         SaveSystem.Register(gameObject, new List<TypeConduitPair>{
-                 
-                new(typeof(string), o => Name = (string)o, () => Name),
-                new (typeof(int), o => Level = (int)o, () => Level),
-                new (typeof(int), o => Health = (int)o, () => Health),
-                new (typeof(int), o => MaxHealth = (int)o, () => MaxHealth),
-                new (typeof(int), o => AttackDamage = (int)o, () => AttackDamage)
-            }
+                new(typeof(string), () => Name, o => Name = (string)o),
+                new (typeof(int), () => Level, o => Level = (int)o),
+                new (typeof(int), () => _health, o => _health = (int)o),
+                new (typeof(int), () => MaxHealth, o => MaxHealth = (int)o),
+                new (typeof(int), () => AttackDamage, o => AttackDamage = (int)o)
+            }, this
         );
+    }
+
+    public void OnLoad()
+    {
         
     }
 
+    public void OnSave()
+    {
+        
+    }
+    
     public void Reset()
     {
         Health = MaxHealth;

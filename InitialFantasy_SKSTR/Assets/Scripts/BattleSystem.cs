@@ -43,17 +43,6 @@ public class BattleSystem : MonoBehaviour
         SaveSerializer.GameDataLoaded += GameLoaded;
     }
     
-    IEnumerator WaitEnumerator(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-    }
-
-    void Wait(float duration)
-    {
-        
-        StartCoroutine(WaitEnumerator(duration));
-    }
-    
     void GameSaved()
     {
         playerUnit.Health = 1;
@@ -79,8 +68,13 @@ public class BattleSystem : MonoBehaviour
         enemyUnit = enemyGo.GetComponent<Unit>();
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
-        playerHUD.SetHUD(playerUnit);
-        enemyHUD.SetHUD(enemyUnit);
+        if (!loaded)
+        {
+            playerHUD.SetUnit(playerUnit);
+            enemyHUD.SetUnit(enemyUnit);
+            loaded = true;
+           // SaveSystem.Save();
+        }
     }
     
     IEnumerator SetupBattle()  // the coroutine (glorified function that handles everything in a state)

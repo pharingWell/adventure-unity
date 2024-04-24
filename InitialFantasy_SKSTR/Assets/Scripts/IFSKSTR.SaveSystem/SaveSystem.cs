@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using Debug = UnityEngine.Debug; //https://github.com/GabrielBigardi/Generic-Save-System/blob/main/DOCUMENTATION.md
 using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using Leguar.TotalJSON;
 using UnityEngine;
+using UnityEngine.Scripting;
 using Object = System.Object;
 
 namespace IFSKSTR.SaveSystem
@@ -16,7 +18,13 @@ namespace IFSKSTR.SaveSystem
         private static Dictionary<string, List<ConduitValuePair>> _gameStateObjects = new ();
         private static Dictionary<string, int> _registeredGameObjects = new ();
 
-        public static void Register(GameObject registeredGameObject, List<TypeConduitPair> typeConduitPairs)
+        public static void Register(GameObject registeredGameObject, List<TypeConduitPair> typeConduitPairs,
+            ISavable self)
+        {
+            Register(registeredGameObject, typeConduitPairs, new LoadSaveCallback(self.OnLoad, self.OnSave));
+        }
+        
+        public static void Register(GameObject registeredGameObject, List<TypeConduitPair> typeConduitPairs, LoadSaveCallback loadSave = null)
         {
             if (!_registeredGameObjects.TryAdd(registeredGameObject.name, 0))
             {
@@ -27,12 +35,14 @@ namespace IFSKSTR.SaveSystem
             if (!_gameStateObjects.ContainsKey(id))
             {
                 _gameStateObjects.Add(id, typeConduitPairs.ConvertAll(x => new ConduitValuePair(x)));
+                loadSave?.Saved();
             }
             else
             {
                 
-               Debug.Log("Object with id \"" +id+"\" loaded from memory");
+               //Debug.Log("Object with id \"" +id+"\" loaded from memory");
                LoadDataOnRegister(id, typeConduitPairs);
+               loadSave?.Loaded();
             }
         }
 
@@ -101,6 +111,13 @@ namespace IFSKSTR.SaveSystem
                 );
             }
             SaveSerializer.Invoke();
+        }
+    }
+
+    public class AuthorAttribute : Attribute
+    {
+        public AuthorAttribute()
+        {
         }
     }
 }

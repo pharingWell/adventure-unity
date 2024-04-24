@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
 {
-    public class SaveSerializer
+    public static class SaveSerializer
     {
         public static event Action GameDataSaved;
         public static event Action GameDataLoaded;
@@ -50,7 +50,7 @@ namespace IFSKSTR.SaveSystem.GDB.SaveSerializer
 
             string json = File.ReadAllText(path);
             string decryptedJson = AesOperation.DecryptString(secretKey, json);
-            Debug.Log(decryptedJson);
+            //Debug.Log(decryptedJson);
             serializableObject = JSON.ParseString(decryptedJson).Deserialize<T>();
             Debug.Log($"Loaded {loadName} successfully!");
             return true;

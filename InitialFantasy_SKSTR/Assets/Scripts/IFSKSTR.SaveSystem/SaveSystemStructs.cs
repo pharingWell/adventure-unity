@@ -28,19 +28,19 @@ namespace IFSKSTR.SaveSystem
     public class TypeConduitPair
     {
         public Type Type;
-        public Conduit<IComparable> Conduit;
+        public Conduit Conduit;
         
         
-        public TypeConduitPair(Type t, Conduit<IComparable> value)
+        public TypeConduitPair(Type t, Conduit value)
         {
             Type = t;
             Conduit = value;
         }
 
-        public TypeConduitPair(Type t, Action<IComparable> set, Func<IComparable> get)
+        public TypeConduitPair(Type t, in Conduit.Get get, in Conduit.Set set)
         {
             Type = t;
-            Conduit = new Conduit<IComparable>(set, get);
+            Conduit = new Conduit(in get, in set);
         }
 
         public override string ToString()
@@ -111,10 +111,10 @@ namespace IFSKSTR.SaveSystem
         [SerializeField] private int type;
         [NonSerialized] public Type Type;
         [SerializeField] private string value;
-        [NonSerialized] public IComparable Value;
+        [NonSerialized] public object Value;
         private const string TypeKey = "type";
         private const string ValueKey = "value";
-
+        
         public TypeValuePair()
         {
             Type = null;
@@ -122,7 +122,7 @@ namespace IFSKSTR.SaveSystem
             type = 0;
             value = null;
         }
-        public TypeValuePair(Type t, IComparable v)
+        public TypeValuePair(Type t, object v)
         {
             type = 0;
             value = null;
@@ -212,7 +212,7 @@ namespace IFSKSTR.SaveSystem
             {
                 obj = json.Deserialize<object>();
             }
-            Value = (IComparable)Convert.ChangeType(obj, Type);
+            Value = Convert.ChangeType(obj, Type);
         }
 
         private static Type GetType(int code)
