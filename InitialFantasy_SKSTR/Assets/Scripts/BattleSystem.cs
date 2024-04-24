@@ -27,6 +27,8 @@ public class BattleSystem : MonoBehaviour
     public BattleHUD playerHUD;
     public BattleHUD enemyHUD;
     public GameObject actions;
+    public Animator playerAnimator;
+    public Animator enemyAnimator;
     
     public BattleState state;
 
@@ -50,12 +52,15 @@ public class BattleSystem : MonoBehaviour
         GameObject enemyGO = Instantiate(enemyPrefab, enemyBattleStation);
         enemyUnit = enemyGO.GetComponent<Unit>();
 
+        playerAnimator = playerGO.GetComponent<Animator>();
+        enemyAnimator = enemyGO.GetComponent<Animator>();
+
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
         
         playerHUD.SetHUD(playerUnit);
         enemyHUD.SetHUD(enemyUnit);
-
+        
         yield return new WaitForSeconds(2f); // need coroutines for this line
 
         state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
@@ -67,15 +72,19 @@ public class BattleSystem : MonoBehaviour
     IEnumerator EnemyTurn() 
     {
         dialogueText.text = enemyUnit.Name + " attacks!";
+        enemyAnimator.SetTrigger("enemyAttack");
+        playerAnimator.SetTrigger("enemyAttack");
 
         yield return new WaitForSeconds(1f);
 
         bool isDead = playerUnit.TakeDamage(enemyUnit.AttackDamage); // is player dead after taking damage?
-
+        
         playerHUD.SetHp(playerUnit.Health); // player's hp bar reflects new hp; also updates hp text
-
         yield return new WaitForSeconds(1f);
 
+        enemyAnimator.ResetTrigger("enemyAttack");
+        playerAnimator.ResetTrigger("enemyAttack");
+        
         if (isDead) // player is dead
         {
             state = BattleState.LOST;
@@ -96,26 +105,34 @@ public class BattleSystem : MonoBehaviour
 
      IEnumerator PlayerAttack()
     {
+        playerAnimator.SetTrigger("playerAttack");
+        enemyAnimator.SetTrigger("playerAttack"); 
         // damage the enemy
         bool isDead = enemyUnit.TakeDamage(playerUnit.AttackDamage);
 
         enemyHUD.SetHp(enemyUnit.Health);
         dialogueText.text = "The attack is successful!";
         yield return new WaitForSeconds(1f); // could be more
+        
         dialogueText.text = "You dealt " + playerUnit.AttackDamage + " damage!";
 
+        playerAnimator.ResetTrigger("playerAttack");
+        enemyAnimator.ResetTrigger("playerAttack");
+        
         // check if enemy is dead
         if(isDead)
-        {
+        {            
             // end the battle
             state = BattleState.WON;
             yield return new WaitForSeconds(2f);
+            
             StartCoroutine(EndBattle());
         } else 
         {
             // enemy turn
             state = BattleState.ENEMYTURN; 
             yield return new WaitForSeconds(2f);
+
             StartCoroutine(EnemyTurn());
         }
         // change state based on what happened
@@ -126,8 +143,14 @@ public class BattleSystem : MonoBehaviour
         // only updating dialogue text at the moment, so coroutine isn't necessary... yet
         if (state == BattleState.WON)
         {
+            //playerAnimator.SetTrigger(enemyDead);
+            playerAnimator.SetTrigger("enemyDead");
+            enemyAnimator.SetTrigger("enemyDead");
+
             dialogueText.text = "You won the battle!";
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1f);
+
+            
 
             // LOAD OUT OF BATTLE HERE
 
@@ -156,8 +179,11 @@ public class BattleSystem : MonoBehaviour
         } else if (state == BattleState.LOST)
         {
             dialogueText.text = "You lost.";
+            playerAnimator.SetTrigger("playerDead");
+            enemyAnimator.SetTrigger("playerDead");
+
             // would probably load out of battle 
-            
+
             // LOAD OUT OF BATTLE HERE
         }
     }

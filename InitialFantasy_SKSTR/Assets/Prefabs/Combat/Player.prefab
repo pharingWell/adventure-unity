@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2508392295160547979}
   - component: {fileID: 8228473061504285900}
   - component: {fileID: 7784718863016764631}
+  - component: {fileID: 8931835618104293423}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -74,9 +75,9 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 932104875, guid: 96742d3571668f54b95cf08362b35a00, type: 3}
+  m_Sprite: {fileID: 87576176, guid: 90f5bac473812e944b6d3e7e84d9da9c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
+  m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
@@ -101,6 +102,27 @@ MonoBehaviour:
   unitLevel: 1
   xp: 0
   levelUpAmount: 10
-  attackDamage: 200
-  currentHp: 15
-  maxHp: 15
+  attackDamage: 20
+  currentHp: 25
+  maxHp: 25
+--- !u!95 &8931835618104293423
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4474980528357910163}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6d9e4d7fdfbd6ab488b90629d13946ca, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

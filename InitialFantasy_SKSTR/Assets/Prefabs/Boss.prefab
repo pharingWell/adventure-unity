@@ -102,5 +102,5 @@ MonoBehaviour:
   xp: 999
   levelUpAmount: 999
   attackDamage: 10
-  currentHp: 999
-  maxHp: 999
+  currentHp: 100
+  maxHp: 100

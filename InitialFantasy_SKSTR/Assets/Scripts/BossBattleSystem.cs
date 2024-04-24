@@ -36,6 +36,7 @@ public class BossBattleSystem : MonoBehaviour
     public Transform enemyBossBattleStation;
 
     public SpriteRenderer enemyBBStationSprite; // needed to adjust color of enemy's battle station
+    public SpriteRenderer playerBBStationSprite;
 
     // two instances of Unit
     Unit playerUnit;
@@ -46,9 +47,12 @@ public class BossBattleSystem : MonoBehaviour
     string enemyColor;
 
     public TextMeshProUGUI dialogueText; // use TextMeshProUGUI for hud
+    public TextMeshProUGUI errorText;
     public BattleHUD playerHUD;
     public BossHUD enemyHUD;
     public GameObject actions;
+
+    public Animator playerAnimator;
     
     public BossBattleState state;
 
@@ -74,19 +78,21 @@ public class BossBattleSystem : MonoBehaviour
         enemyUnit = enemyGO.GetComponent<Unit>();
         //Debug.Log("enemy unit gotten");
 
+        playerAnimator = playerGO.GetComponent<Animator>();
+
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered aaaaaa ERR0R_n0_n@m#? ?";
         
         playerHUD.SetHUD(playerUnit);
-        Debug.Log("player hud gotten");
+        //Debug.Log("player hud gotten");
         enemyHUD.SetHUD(enemyUnit);
-        Debug.Log("enemy hud gotten");
+        //Debug.Log("enemy hud gotten");
 
         yield return new WaitForSeconds(2f); // need coroutines for this line
 
         // want the enemy to go first, unlike normal battle system
         state = BossBattleState.ENEMYTURN;
-        Debug.Log("state set to enemyturn");
+        //Debug.Log("state set to enemyturn");
         // in this case, the enemy should go first because it will change its color
         // after attacking
         StartCoroutine(EnemyTurn());
@@ -96,9 +102,12 @@ public class BossBattleSystem : MonoBehaviour
     IEnumerator EnemyTurn() 
     {
         dialogueText.text = "n n@m3!? attacks!";
+        playerAnimator.SetTrigger("enemyAttack");
         yield return new WaitForSeconds(1f);
+
         bool isDead = playerUnit.TakeDamage(enemyUnit.AttackDamage); // is player dead after taking damage?
         playerHUD.SetHp(playerUnit.Health); // player's hp bar reflects new hp; also updates hp text
+        playerBBStationSprite.color = new Color(0.5f, 0.5f, 0.5f, 1); // player's circle also changes color to gray to indicate damage 
         yield return new WaitForSeconds(1f);
 
         // set the enemy's color, which the player will have to correctly guess
@@ -130,16 +139,16 @@ public class BossBattleSystem : MonoBehaviour
                 // code block
                 break;
         }
-
+        playerAnimator.ResetTrigger("enemyAttack");
         if (isDead) // player is dead
         {
             state = BossBattleState.LOST;
-            Debug.Log("state is lost");
+            //Debug.Log("state is lost");
             StartCoroutine(EndBattle());
         } else // player survived
         {
             state = BossBattleState.PLAYERTURN;
-            Debug.Log("state is playerturn");
+            //Debug.Log("state is playerturn");
             PlayerTurn();
         }
     }
@@ -149,7 +158,7 @@ public class BossBattleSystem : MonoBehaviour
         dialogueText.text = "Choose an action:"; 
         // the "actions" are really just the colors
         actions.SetActive(true);
-        Debug.Log("actions active");
+        //Debug.Log("actions active");
     }
 
      IEnumerator PlayerAttack()
@@ -160,6 +169,8 @@ public class BossBattleSystem : MonoBehaviour
             // damage the enemy
             bool isDead = enemyUnit.TakeDamage(playerUnit.AttackDamage);
             enemyHUD.SetHp(enemyUnit.Health, enemyUnit); // change with BossHUD.cs --> must include unit
+
+            playerBBStationSprite.color = new Color(1, 1, 1, 1); // player's circle also changes color to regular sprite 
             dialogueText.text = "You did... something, but does it matter...?";
             // check if enemy is dead
             // change state based on what happened
@@ -167,7 +178,7 @@ public class BossBattleSystem : MonoBehaviour
             {
                 // end the battle
                 state = BossBattleState.WON;
-                Debug.Log("state is won");
+                //Debug.Log("state is won");
                 yield return new WaitForSeconds(2f);
                 StartCoroutine(EndBattle());
             } else 
@@ -178,10 +189,11 @@ public class BossBattleSystem : MonoBehaviour
             }
         } else 
         {
+            playerBBStationSprite.color = new Color(0, 0, 0, 1); // player's circle also changes color to black 
             dialogueText.text = "The being seems unaffected.";
             // enemy turn
             state = BossBattleState.ENEMYTURN; 
-            Debug.Log("state is enemyturn");
+            //Debug.Log("state is enemyturn");
             yield return new WaitForSeconds(2f);
             StartCoroutine(EnemyTurn());
         }
@@ -197,6 +209,9 @@ public class BossBattleSystem : MonoBehaviour
             yield return new WaitForSeconds(2f);
             dialogueText.text = "You won the battle!";
             yield return new WaitForSeconds(2f);
+            // mild jumpscare
+            errorText.text = "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR";
+            yield return new WaitForSeconds(1.5f);
             /*
             // below is an xp system that would be implemented in a further stage of development
 
@@ -219,6 +234,7 @@ public class BossBattleSystem : MonoBehaviour
 
         } else if (state == BossBattleState.LOST)
         {
+            playerAnimator.SetTrigger("playerDead");
             dialogueText.text = "You lost.";
             yield return new WaitForSeconds(2f);
             dialogueText.text = "Hero... do not come back.";
@@ -249,7 +265,7 @@ public class BossBattleSystem : MonoBehaviour
     // buttons that match colors
     public void OnRedButton() // player clicks red
     {
-        Debug.Log("player clicked red");
+        //Debug.Log("player clicked red");
         if (state != BossBattleState.PLAYERTURN)
             return;
         actions.SetActive(false);
@@ -259,7 +275,7 @@ public class BossBattleSystem : MonoBehaviour
 
     public void OnGreenButton() // player clicks green
     {
-        Debug.Log("player clicked green");
+        //Debug.Log("player clicked green");
         if (state != BossBattleState.PLAYERTURN)
             return;
         actions.SetActive(false);
@@ -269,7 +285,7 @@ public class BossBattleSystem : MonoBehaviour
 
     public void OnBlueButton() // player clicks blue
     {
-        Debug.Log("player clicked blue");
+        //Debug.Log("player clicked blue");
         if (state != BossBattleState.PLAYERTURN)
             return;
         actions.SetActive(false);
@@ -279,7 +295,7 @@ public class BossBattleSystem : MonoBehaviour
 
     public void OnYellowButton() // player clicks yellow
     {
-        Debug.Log("player clicked yellow");
+        //Debug.Log("player clicked yellow");
         if (state != BossBattleState.PLAYERTURN)
             return;
         actions.SetActive(false);

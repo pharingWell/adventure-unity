@@ -255,6 +255,8 @@ MonoBehaviour:
   playerHUD: {fileID: 556851243}
   enemyHUD: {fileID: 35027529}
   actions: {fileID: 1022070747}
+  playerAnimator: {fileID: 0}
+  enemyAnimator: {fileID: 0}
   state: 0
 --- !u!4 &109101281
 Transform:
