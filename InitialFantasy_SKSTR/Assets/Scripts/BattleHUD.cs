@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using IFSKSTR.SaveSystem;
+using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -14,14 +16,22 @@ public class BattleHUD : MonoBehaviour
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI healthText;
     public Slider healthSlider;
-
-    public void SetHUD(Unit unit)
+    private Unit _unit;
+    public void SetUnit(Unit unit)
     {
-        nameText.text = unit.Name;
-        levelText.text = "Level " + unit.Level;
-        healthSlider.maxValue = unit.MaxHealth;
-        healthSlider.value = unit.Health;
-        healthText.text = unit.Health.ToString();
+        _unit = unit;
+        _unit.hud = this;
+        SetHUD();
+    }
+
+    public void SetHUD()
+    {
+        nameText.text = _unit.Name;
+        levelText.text = "Level " + _unit.Level;
+        healthSlider.maxValue = _unit.MaxHealth;
+        healthSlider.value = _unit.Health;
+        healthText.text = _unit.Health.ToString();
+        print(_unit.Level);
 
     } 
 

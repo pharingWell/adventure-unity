@@ -1,62 +1,69 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using IFSKSTR.SaveSystem;
+using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Unit : MonoBehaviour
+public class Unit : MonoBehaviour, ISavable
 {
-    
     [SerializeField] private string unitName;
-    [SerializeField] private int unitLevel;
+    public string Name { get => unitName; set => unitName = value; }
+    [SerializeField] private int level;
+    [Author]
+    public int Level { get => level; set => level = value; }
+    [Author]
+    private int _health;
+    public int Health { get => _health; set => _health = value; }
+    [SerializeField] private int maxHealth;
+    public int MaxHealth { get => maxHealth; set => maxHealth = value; }
     [SerializeField] private int attackDamage;
-    [SerializeField] private int currentHp;
-    [SerializeField] private int maxHp;
-        
-    public Unit(string unitName, int unitLevel, int startingHp, int maxHp, int attackDamage) {
-        Name = unitName;
-        Level = unitLevel;
-        Health = startingHp;
-        MaxHealth = maxHp;
-        AttackDamage = attackDamage;
+    public int AttackDamage { get => attackDamage; set => attackDamage = value; }
+    public BattleHUD hud;
+    private void Start()
+    {
+        SaveSystem.Register(gameObject, new List<TypeConduitPair>{
+                new(typeof(string), () => Name, o => Name = (string)o),
+                new (typeof(int), () => Level, o => Level = (int)o),
+                new (typeof(int), () => _health, o => _health = (int)o),
+                new (typeof(int), () => MaxHealth, o => MaxHealth = (int)o),
+                new (typeof(int), () => AttackDamage, o => AttackDamage = (int)o)
+            }, this
+        );
     }
 
-    public string Name
+    public void OnLoad()
     {
-        get => unitName;
-        private set => unitName = value;
+        if (hud)
+        {
+            hud.SetUnit(this);
+        }
+        else
+        { Debug.LogWarning("hud was empty");
+        }
     }
-    public int Level
+
+    public void OnSave()
     {
-        get => unitLevel;
-        private set => unitLevel = value;
-    }
-    public int Health
-    {
-        get => currentHp;
-        private set => currentHp = value;
-    }
-    public int MaxHealth
-    {
-        get => maxHp;
-        private set => maxHp = value;
-    }
-    public int AttackDamage
-    {
-        get => attackDamage;
-        private set => attackDamage = value;
+        
     }
     
+    public void Reset()
+    {
+        Health = MaxHealth;
+    }
+
     public bool TakeDamage(int amount)
     {
-        if (amount > 0) currentHp -= Math.Min(amount, currentHp); // don't go under 0
+        if (amount > 0) Health -= Math.Min(amount, Health); // don't go under 0
        
-        if (currentHp < 0) currentHp = 0;
-        return (currentHp == 0);  // if the health is 0 or less, then unit is dead
+        if (Health < 0) Health = 0;
+        return (Health == 0);  // if the health is 0 or less, then unit is dead
     }
 
     public void Heal(int amount) 
     {
-        currentHp += Math.Min(amount, maxHp-currentHp); // don't go over max health 
+        Health += Math.Min(amount, MaxHealth-Health); // don't go over max health 
     }
+
 }

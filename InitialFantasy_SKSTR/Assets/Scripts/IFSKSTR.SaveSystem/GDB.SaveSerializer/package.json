@@ -1,0 +1,14 @@
+{
+  "name": "com.gabrielbigardi.savesystem",
+  "version": "1.1.0",
+  "displayName": "Generic Save System",
+  "description": "Performatic, secure and easy save system",
+  "unity": "2020.3",
+  "unityRelease": "26f1",
+  "keywords": [
+    "save",
+    "system"
+  ],
+
+  "type": "tool"
+}

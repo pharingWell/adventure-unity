@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using IFSKSTR.SaveSystem;
+using IFSKSTR.SaveSystem.GDB.SaveSerializer;
 using UnityEngine.UIElements; // needed for TextMeshProUGUI to work
 
 // i used the tutorial from https://www.youtube.com/watch?v=_1pz_ohupPs
@@ -18,6 +20,9 @@ public class BattleSystem : MonoBehaviour
     public Transform playerBattleStation;
     public Transform enemyBattleStation;
 
+    private bool loaded;
+    private GameObject playerGo;
+    private GameObject enemyGo;
     Unit playerUnit;
     Unit enemyUnit;
 
@@ -33,29 +38,51 @@ public class BattleSystem : MonoBehaviour
     void Start()
     {
         state = BattleState.START;
-        StartCoroutine(SetupBattle()); 
+        StartCoroutine(SetupBattle());
+        SaveSerializer.GameDataSaved += GameSaved;
+        SaveSerializer.GameDataLoaded += GameLoaded;
+    }
+    
+    void GameSaved()
+    {
+        playerUnit.Health = 1;
+        Destroy(enemyGo);
+        Destroy(enemyUnit);
+        Destroy(playerGo);
+        Destroy(playerUnit);
+        SaveSystem.Load();
+    }
+    
+    void GameLoaded()
+    {
+        Setup();
     }
 
-    IEnumerator SetupBattle()  // the coroutine (glorified function that handles everything in a state)
+    void Setup()
     {
-        // instantiate a player game object using the player prefab
-        // spawn it on top of the player battle station
-        GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
-        playerUnit = playerGO.GetComponent<Unit>();
-
+        playerGo = Instantiate(playerPrefab, playerBattleStation);
+        playerUnit = playerGo.GetComponent<Unit>();
         // instantiate an enemy game object using the enemy prefab
         // spawn it on top of the enemy battle station
-        GameObject enemyGO = Instantiate(enemyPrefab, enemyBattleStation);
-        enemyUnit = enemyGO.GetComponent<Unit>();
-
+        enemyGo = Instantiate(enemyPrefab, enemyBattleStation);
+        enemyUnit = enemyGo.GetComponent<Unit>();
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
-        
-        playerHUD.SetHUD(playerUnit);
-        enemyHUD.SetHUD(enemyUnit);
-
-        yield return new WaitForSeconds(2f); // need coroutines for this line
-
+        playerHUD.SetUnit(playerUnit);
+        enemyHUD.SetUnit(enemyUnit);
+        if (!loaded)
+        {
+            loaded = true;
+           // SaveSystem.Save();
+        }
+    }
+    
+    IEnumerator SetupBattle()  // the coroutine (glorified function that handles everything in a state)
+    {
+        Setup();
+        yield return new WaitForSeconds(1f); // need coroutines for this line
+        GameSaved();
+        yield return new WaitForSeconds(5f);
         state = BattleState.PLAYERTURN; // now that the battle is set up, let the player have their turn
         PlayerTurn();
     }
