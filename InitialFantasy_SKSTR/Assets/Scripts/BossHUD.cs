@@ -54,7 +54,7 @@ public class BossHUD : MonoBehaviour
         } 
     } 
 
-    public void SetHp(int hp) {
+    public void SetHp(int hp, Unit unit) { // a unit is included to get the health values
         hpSlider.value = hp;
         // hpText.text = "HP " + hp; // update HP text
         // i know, i know, copying and pasting a block like this isn't great
