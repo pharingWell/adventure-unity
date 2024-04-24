@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.VisualScripting;
+using Button = UnityEngine.UIElements.Button;
 using Random = UnityEngine.Random; // needed for TextMeshProUGUI to work
 
 // this is essentially the same as BattleSystem.cs
@@ -52,7 +53,7 @@ public class BossBattleSystem : MonoBehaviour
     Unit enemyUnit;
 
     // colors for battle: one is the player input, one is the boss's answer
-    List<SimonColor> enemyColor;
+    List<SimonColor> _enemyColor;
     private int _colorCount = 0;
     private bool _successfulColor = false;
     private const bool AdultSimon = true;
@@ -102,12 +103,12 @@ public class BossBattleSystem : MonoBehaviour
         //Debug.Log("player hud gotten");
         enemyHUD.SetHUD(enemyUnit);
         //Debug.Log("enemy hud gotten");
-
+        _enemyGo.GetComponent<SpriteRenderer>().sortingOrder = 10;
         yield return new WaitForSeconds(2f); // need coroutines for this line
 
         // want the enemy to go first, unlike normal battle system
         state = BossBattleState.ENEMYTURN;
-        enemyColor = new List<SimonColor>();
+        _enemyColor = new List<SimonColor>();
         //Debug.Log("state set to enemyturn");
         // in this case, the enemy should go first because it will change its color
         // after attacking
@@ -124,14 +125,14 @@ public class BossBattleSystem : MonoBehaviour
         // quick note: unlike in editor, Color(r, g, b, a) only takes values from
         // 0 to 1, not 0 to 255. you can use decimals, though.
 
-        enemyColor.Add((SimonColor)Random.Range(1, 5)); // int version of Random.Range --> upper bound is EXCLUSIVE);
+        _enemyColor.Add((SimonColor)Random.Range(1, 5)); // int version of Random.Range --> upper bound is EXCLUSIVE);
         SimonColor previousColor = SimonColor.NULL;
-        foreach (SimonColor color in enemyColor)
+        foreach (SimonColor color in _enemyColor)
         {
             if (previousColor == color)
             {
                 enemyBBStationSprite.color = new Color(0, 0, 0, 1);
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.05f);
             }
             switch(color) 
             {
@@ -148,8 +149,8 @@ public class BossBattleSystem : MonoBehaviour
                 case SimonColor.YELLOW: // yellow
                     enemyBBStationSprite.color = new Color(1, 1, 0, 1);
                     break;
-                default: // red 
-                    enemyBBStationSprite.color = new Color(1, 0, 0, 1);
+                default: // null
+                    enemyBBStationSprite.color = new Color(0, 0, 0, 0);
                     // code block
                     break;
             }
@@ -157,7 +158,7 @@ public class BossBattleSystem : MonoBehaviour
             previousColor = color;
             yield return new WaitForSeconds(1f);
         }
-        Debug.Log(string.Join(" ", enemyColor));
+        Debug.Log(string.Join(" ", _enemyColor));
         enemyBBStationSprite.color = new Color(0, 0, 0, 1);
         bool isDead = playerUnit.TakeDamage(enemyUnit.AttackDamage); // is player dead after taking damage?
         playerHUD.SetHp(playerUnit.Health); // player's hp bar reflects new hp; also updates hp text
@@ -184,14 +185,30 @@ public class BossBattleSystem : MonoBehaviour
     {
         dialogueText.text = "Choose an action:"; 
         // the "actions" are really just the colors
+        actions.SetActive(true);
+        foreach (Transform childTransform in actions.transform)
+        {
+            GameObject child = childTransform.gameObject;
+            UnityEngine.UI.Button button = child.GetComponent<UnityEngine.UI.Button>();
+            if (button != null)
+            {
+                button.interactable = false;
+                button.interactable = true;
+            }
+        }
+        // foreach (var button in actions.GetComponents<Button>())
+        // {
+        //     button.enabled = true;
+        // }
         _colorCount = 0;
         _successfulColor = true;
-        actions.SetActive(true);
         //Debug.Log("actions active");
     }
 
      IEnumerator PlayerAttack()
     {
+        yield return new WaitForSeconds(0.1f);
+        actions.SetActive(false);
         // does the "attack" match the correct color?
         if (_successfulColor) 
         {
@@ -238,10 +255,13 @@ public class BossBattleSystem : MonoBehaviour
             dialogueText.text = "You won the battle!";
             yield return new WaitForSeconds(2f);
             enemyAnimator.SetTrigger(BossVanish);
+            const float jumpscareDuration = 0.3f;
+            errorText.text = "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR";
+            yield return new WaitForSeconds(Math.Max(0,enemyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.length-jumpscareDuration));
+            errorText.text = "";
+            yield return new WaitForSeconds(jumpscareDuration);
             _enemyGo.SetActive(false);
             Destroy(_enemyGo);
-            errorText.text = "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR";
-            yield return new WaitForSeconds(1.5f);
             /*
             // below is an xp system that would be implemented in a further stage of development
 
@@ -298,21 +318,19 @@ public class BossBattleSystem : MonoBehaviour
     {
         if (state != BossBattleState.PLAYERTURN)
             return;
-        if (color != enemyColor[_colorCount])
+        if (color != _enemyColor[_colorCount])
         {
             _successfulColor = false;
         }
-        if (_colorCount + 1 < enemyColor.Count)
+        if (_successfulColor && _colorCount + 1 < _enemyColor.Count)
         {
             _colorCount += 1;
         }
         else
         {
-            actions.SetActive(false);
             StartCoroutine(PlayerAttack());
         }
     }
-
     public void BlueButton()
     {
         AddColor(SimonColor.BLUE);

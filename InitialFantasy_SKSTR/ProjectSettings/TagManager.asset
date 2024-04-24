@@ -12,7 +12,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Boss
   - 
   - 
   - 
@@ -50,4 +50,7 @@ TagManager:
     locked: 0
   - name: HUD
     uniqueID: 3704787865
+    locked: 0
+  - name: Boss
+    uniqueID: 3733943711
     locked: 0
