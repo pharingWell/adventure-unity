@@ -31,6 +31,10 @@ public class BattleSystem : MonoBehaviour
     public Animator enemyAnimator;
     
     public BattleState state;
+    private static readonly int PlayerAttackHash = Animator.StringToHash("PlayerAttack");
+    private static readonly int EnemyAttackHash = Animator.StringToHash("EnemyAttackHash");
+    private static readonly int EnemyDead = Animator.StringToHash("enemyDead");
+    private static readonly int PlayerDead = Animator.StringToHash("playerDead");
 
     // Start is called before the first frame update
     void Start()
@@ -44,16 +48,16 @@ public class BattleSystem : MonoBehaviour
         actions.SetActive(false);
         // instantiate a player game object using the player prefab
         // spawn it on top of the player battle station
-        GameObject playerGO = Instantiate(playerPrefab, playerBattleStation);
-        playerUnit = playerGO.GetComponent<Unit>();
+        GameObject playerGo = Instantiate(playerPrefab, playerBattleStation);
+        playerUnit = playerGo.GetComponent<Unit>();
 
         // instantiate an enemy game object using the enemy prefab
         // spawn it on top of the enemy battle station
-        GameObject enemyGO = Instantiate(enemyPrefab, enemyBattleStation);
-        enemyUnit = enemyGO.GetComponent<Unit>();
+        GameObject enemyGo = Instantiate(enemyPrefab, enemyBattleStation);
+        enemyUnit = enemyGo.GetComponent<Unit>();
 
-        playerAnimator = playerGO.GetComponent<Animator>();
-        enemyAnimator = enemyGO.GetComponent<Animator>();
+        playerAnimator = playerGo.GetComponent<Animator>();
+        enemyAnimator = enemyGo.GetComponent<Animator>();
 
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
@@ -72,8 +76,8 @@ public class BattleSystem : MonoBehaviour
     IEnumerator EnemyTurn() 
     {
         dialogueText.text = enemyUnit.Name + " attacks!";
-        enemyAnimator.SetTrigger("enemyAttack");
-        playerAnimator.SetTrigger("enemyAttack");
+        enemyAnimator.SetTrigger(EnemyAttackHash);
+        playerAnimator.SetTrigger(EnemyAttackHash);
 
         yield return new WaitForSeconds(1f);
 
@@ -82,8 +86,8 @@ public class BattleSystem : MonoBehaviour
         playerHUD.SetHp(playerUnit.Health); // player's hp bar reflects new hp; also updates hp text
         yield return new WaitForSeconds(1f);
 
-        enemyAnimator.ResetTrigger("enemyAttack");
-        playerAnimator.ResetTrigger("enemyAttack");
+        enemyAnimator.ResetTrigger(EnemyAttackHash);
+        playerAnimator.ResetTrigger(EnemyAttackHash);
         
         if (isDead) // player is dead
         {
@@ -105,8 +109,8 @@ public class BattleSystem : MonoBehaviour
 
      IEnumerator PlayerAttack()
     {
-        playerAnimator.SetTrigger("playerAttack");
-        enemyAnimator.SetTrigger("playerAttack"); 
+        playerAnimator.SetTrigger(PlayerAttackHash);
+        enemyAnimator.SetTrigger(PlayerAttackHash); 
         // damage the enemy
         bool isDead = enemyUnit.TakeDamage(playerUnit.AttackDamage);
 
@@ -116,8 +120,8 @@ public class BattleSystem : MonoBehaviour
         
         dialogueText.text = "You dealt " + playerUnit.AttackDamage + " damage!";
 
-        playerAnimator.ResetTrigger("playerAttack");
-        enemyAnimator.ResetTrigger("playerAttack");
+        playerAnimator.ResetTrigger(PlayerAttackHash);
+        enemyAnimator.ResetTrigger(PlayerAttackHash);
         
         // check if enemy is dead
         if(isDead)
@@ -144,8 +148,8 @@ public class BattleSystem : MonoBehaviour
         if (state == BattleState.WON)
         {
             //playerAnimator.SetTrigger(enemyDead);
-            playerAnimator.SetTrigger("enemyDead");
-            enemyAnimator.SetTrigger("enemyDead");
+            playerAnimator.SetTrigger(EnemyDead);
+            enemyAnimator.SetTrigger(EnemyDead);
 
             dialogueText.text = "You won the battle!";
             yield return new WaitForSeconds(1f);
@@ -168,7 +172,7 @@ public class BattleSystem : MonoBehaviour
                 dialogueText.text = "Wow! You leveled up to " + playerUnit.Level + ".";
                 yield return new WaitForSeconds(2f);
                 dialogueText.text = "Your Max HP is now " + playerUnit.MaxHealth 
-                                    + ", and your Attack is " + playerUnit.AttackDamage + ".";
+                                    + ", and your PlayerAttack is " + playerUnit.AttackDamage + ".";
             } else 
             {
                 yield return new WaitForSeconds(1f);
@@ -179,8 +183,8 @@ public class BattleSystem : MonoBehaviour
         } else if (state == BattleState.LOST)
         {
             dialogueText.text = "You lost.";
-            playerAnimator.SetTrigger("playerDead");
-            enemyAnimator.SetTrigger("playerDead");
+            playerAnimator.SetTrigger(PlayerDead);
+            enemyAnimator.SetTrigger(PlayerDead);
 
             // would probably load out of battle 
 
