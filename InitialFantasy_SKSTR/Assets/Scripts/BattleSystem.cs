@@ -79,7 +79,7 @@ public class BattleSystem : MonoBehaviour
         if (isDead) // player is dead
         {
             state = BattleState.LOST;
-            EndBattle();
+            StartCoroutine(EndBattle());
         } else // player survived
         {
             state = BattleState.PLAYERTURN;

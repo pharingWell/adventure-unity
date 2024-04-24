@@ -10,9 +10,7 @@ using TMPro; // needed for TextMeshProUGUI to work
 //      and may use special characters when those things are not normally
 //      acceptable or use variable types that do not line up with the
 //      ones in the normal BattleHUD.cs.
-// i've kept the "normal" battle hud lines to show what would
-//      have been used instead to make edits and understanding the 
-//      code a bit easier, at least in my opinion.
+// the layout of this code is roughly the same as BattleHUD.cs
 // also, because this is based on BattleHUD.cs, i cite that i
 //      used this tutorial to make the system: 
 //      https://www.youtube.com/watch?v=_1pz_ohupPs
@@ -30,34 +28,20 @@ public class BossHUD : MonoBehaviour
     public void SetHUD(Unit unit)
     {
         nameText.text = unit.Name;
-        // levelText.text = "Level " + unit.Level;
-        levelText.text = "???";
+        levelText.text = "01001001 00100000 01100001 01101101 00100000 01010100 01101000 01100001 01110100 00100000 01110111 01101000 01101001 01100011 01101000 00100000 01000011 01100001 01101110 01001110 01001111 01010100 00100000 01100010 01100101 00100000 01001011 01101110 01101111 01110111 01101110 00101110";
+        // the above translates to: "I am That which CanNOT be Known."
 
         hpSlider.maxValue = unit.MaxHealth;
         hpSlider.value = unit.Health;
-        // hpText.text = "HP " + unit.Health; // display hp
 
         // idea: convey hp info not in normal numbers but rather in words
-        if (unit.Health <= 500 && unit.Health > 100) 
-        {   
-            // the player has actually dealt some damage
-            hpText.text = "p3rh@ps u cann ?"; 
-        } else if (unit.Health <= 100) 
-        {
-            // the player is close to success
-            hpText.text = "c c3@SE 111mmeDIEat3l yy!!";
-        } else 
-        {
-            // the player has not dealt enough damage yet to be a concern
-            // to the horror
-            hpText.text = "giv3 uuupp 'hero' ";
-        } 
+        // hp starts off at a ridiculously high number
+        hpText.text = "giv3 uuupp 'hero' ";
     } 
 
     public void SetHp(int hp, Unit unit) { // a unit is included to get the health values
         hpSlider.value = hp;
-        // hpText.text = "HP " + hp; // update HP text
-        // i know, i know, copying and pasting a block like this isn't great
+        
         // idea: convey hp info not in normal numbers but rather in words
         if (unit.Health <= 500 && unit.Health > 100) 
         {   
