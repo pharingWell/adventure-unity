@@ -337,6 +337,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6686448292149413650, guid: ed75add7fa1cb4cfe96cf81b52efef77, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6686448292149413650, guid: ed75add7fa1cb4cfe96cf81b52efef77, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6686448292149413650, guid: ed75add7fa1cb4cfe96cf81b52efef77, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6670274534141567231, guid: ed75add7fa1cb4cfe96cf81b52efef77, type: 3}
@@ -433,6 +445,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 1484116968, guid: 3198b52a18b4048ffa212c0a5fbac9f9, type: 3}
+    - target: {fileID: 8242356529270625279, guid: 3bd7994c517b2411c970ba70d70b76c1, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8242356529270625279, guid: 3bd7994c517b2411c970ba70d70b76c1, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9110091489801171058, guid: 3bd7994c517b2411c970ba70d70b76c1, type: 3}
       propertyPath: m_Controller
       value: 
