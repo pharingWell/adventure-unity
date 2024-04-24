@@ -75,6 +75,12 @@ public class Unit : MonoBehaviour
         currentHp += Math.Min(amount, maxHp-currentHp); // don't go over max health 
     }
 
+    /*
+    // below are functions that would be used with a level up feature,
+    // one that is beyond the development of this beta
+    // other vestiges have been left in place as they don't take up much,
+    // but the relevant functions have been removed
+
     public void GainXP(int amount)
     {
         if ((xp + amount) >= levelUpAmount) // if the player has enough xp to level up
@@ -101,5 +107,6 @@ public class Unit : MonoBehaviour
         currentHp = maxHp; // heal player after battle?
         attackDamage += 2; // each level gives an additional 2 attackDamage
     }
+    */
 
 }

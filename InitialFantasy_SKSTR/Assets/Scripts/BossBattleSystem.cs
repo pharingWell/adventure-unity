@@ -197,6 +197,9 @@ public class BossBattleSystem : MonoBehaviour
             yield return new WaitForSeconds(2f);
             dialogueText.text = "You won the battle!";
             yield return new WaitForSeconds(2f);
+            /*
+            // below is an xp system that would be implemented in a further stage of development
+
             // maybe the player gains xp? obviously they don't really get to "keep" their levels
             // but the illusion of getting xp and levels
             int currLevel = playerUnit.Level;
@@ -210,6 +213,8 @@ public class BossBattleSystem : MonoBehaviour
                 dialogueText.text = "Your Max HP is now " + playerUnit.MaxHealth 
                                     + ", and your Attack is " + playerUnit.AttackDamage + ".";
             } 
+            */
+
             // LOAD OUT OF BATTLE HERE
 
         } else if (state == BossBattleState.LOST)

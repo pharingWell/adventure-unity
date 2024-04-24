@@ -128,6 +128,12 @@ public class BattleSystem : MonoBehaviour
         {
             dialogueText.text = "You won the battle!";
             yield return new WaitForSeconds(2f);
+
+            // LOAD OUT OF BATTLE HERE
+
+            /*
+            // below was an xp system that would be implemented in a further stage of development
+            
             // maybe the player gains xp? obviously they don't really get to "keep" their levels
             // but the illusion of getting xp and levels
             int currLevel = playerUnit.Level;
@@ -145,10 +151,14 @@ public class BattleSystem : MonoBehaviour
                 yield return new WaitForSeconds(1f);
                 dialogueText.text = "[End Battle]";
             }
+            */
+
         } else if (state == BattleState.LOST)
         {
             dialogueText.text = "You lost.";
             // would probably load out of battle 
+            
+            // LOAD OUT OF BATTLE HERE
         }
     }
 
