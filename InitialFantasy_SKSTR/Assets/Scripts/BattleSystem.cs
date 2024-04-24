@@ -68,10 +68,10 @@ public class BattleSystem : MonoBehaviour
         enemyUnit = enemyGo.GetComponent<Unit>();
         // changes the dialogue text to include the enemy's name
         dialogueText.text = "You encountered a " + enemyUnit.Name + "!";
+        playerHUD.SetUnit(playerUnit);
+        enemyHUD.SetUnit(enemyUnit);
         if (!loaded)
         {
-            playerHUD.SetUnit(playerUnit);
-            enemyHUD.SetUnit(enemyUnit);
             loaded = true;
            // SaveSystem.Save();
         }

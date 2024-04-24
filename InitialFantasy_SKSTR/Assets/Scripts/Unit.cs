@@ -19,6 +19,7 @@ public class Unit : MonoBehaviour, ISavable
     public int MaxHealth { get => maxHealth; set => maxHealth = value; }
     [SerializeField] private int attackDamage;
     public int AttackDamage { get => attackDamage; set => attackDamage = value; }
+    public BattleHUD hud;
     private void Start()
     {
         SaveSystem.Register(gameObject, new List<TypeConduitPair>{
@@ -33,7 +34,13 @@ public class Unit : MonoBehaviour, ISavable
 
     public void OnLoad()
     {
-        
+        if (hud)
+        {
+            hud.SetUnit(this);
+        }
+        else
+        { Debug.LogWarning("hud was empty");
+        }
     }
 
     public void OnSave()

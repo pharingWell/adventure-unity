@@ -20,7 +20,7 @@ public class BattleHUD : MonoBehaviour
     public void SetUnit(Unit unit)
     {
         _unit = unit;
-        SaveSerializer.GameDataLoaded += SetHUD;
+        _unit.hud = this;
         SetHUD();
     }
 
