@@ -12,7 +12,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Boss
   - 
   - 
   - 
@@ -39,9 +39,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 2450340067
+    locked: 0
+  - name: Battle Station
+    uniqueID: 18235989
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: UI
-    uniqueID: 3074886921
+  - name: HUD
+    uniqueID: 3704787865
+    locked: 0
+  - name: Boss
+    uniqueID: 3733943711
     locked: 0
