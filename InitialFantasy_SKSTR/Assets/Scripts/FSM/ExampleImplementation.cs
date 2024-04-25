@@ -8,7 +8,7 @@ namespace FSM
    
         void Start()
         {
-           _stateMachine.ChangeState(new TestState(this));
+           _stateMachine.ChangeState(new ExampleState(this));
         }
  
         void Update()
