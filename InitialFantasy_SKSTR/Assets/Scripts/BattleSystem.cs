@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using TMPro;
 using IFSKSTR.SaveSystem;
 using IFSKSTR.SaveSystem.GDB.SaveSerializer;
+
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements; // needed for TextMeshProUGUI to work
 
 // i used the tutorial from https://www.youtube.com/watch?v=_1pz_ohupPs
@@ -195,6 +197,7 @@ public class BattleSystem : MonoBehaviour
                 dialogueText.text = "[End Battle]";
             }
             */
+            SceneManager.LoadScene(1, LoadSceneMode.Single);
 
         } else if (state == BattleState.LOST)
         {
@@ -204,7 +207,7 @@ public class BattleSystem : MonoBehaviour
 
             // would probably load out of battle 
 
-            // LOAD OUT OF BATTLE HERE
+            SceneManager.LoadScene(0, LoadSceneMode.Single);
         }
     }
 
