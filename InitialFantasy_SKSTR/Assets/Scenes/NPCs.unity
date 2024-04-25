@@ -243,6 +243,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6686448292149413650, guid: ed75add7fa1cb4cfe96cf81b52efef77, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6686448292149413650, guid: ed75add7fa1cb4cfe96cf81b52efef77, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -300,6 +308,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8242356529270625279, guid: 3bd7994c517b2411c970ba70d70b76c1, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8242356529270625279, guid: 3bd7994c517b2411c970ba70d70b76c1, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9075146002855372145, guid: 3bd7994c517b2411c970ba70d70b76c1, type: 3}
       propertyPath: dialogue.name
       value: PHILLIP
@@ -334,6 +350,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4212954110262205248, guid: 5a90f212677a64fb786dcdaf02a5b3ce, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4212954110262205248, guid: 5a90f212677a64fb786dcdaf02a5b3ce, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4734797335378766987, guid: 5a90f212677a64fb786dcdaf02a5b3ce, type: 3}
       propertyPath: m_Name
       value: Lavinia
@@ -434,6 +458,14 @@ PrefabInstance:
     - target: {fileID: 6091613599799321013, guid: eae9e2a60de4449ed83c0c2643bf2148, type: 3}
       propertyPath: m_Name
       value: Walter
+      objectReference: {fileID: 0}
+    - target: {fileID: 6409833772069828856, guid: eae9e2a60de4449ed83c0c2643bf2148, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6409833772069828856, guid: eae9e2a60de4449ed83c0c2643bf2148, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
