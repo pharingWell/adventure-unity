@@ -442,6 +442,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8178d0e67a7b94d72a2588ca3b40d0c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dialogueText: {fileID: 1868058054}
+  fullText: Day One
+  typingSpeed: 0.13
 --- !u!1 &806747508
 GameObject:
   m_ObjectHideFlags: 0
@@ -522,7 +525,7 @@ GameObject:
   - component: {fileID: 1868058055}
   - component: {fileID: 1868058054}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Day One
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
