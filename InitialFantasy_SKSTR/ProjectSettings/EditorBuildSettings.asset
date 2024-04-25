@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Day X.unity
     guid: 29de367d35efe46f894312668e9f8c8f
   - enabled: 1
@@ -19,8 +19,11 @@ EditorBuildSettings:
     guid: 2bbc0ebdfd386b2498ce975ab9ad7903
   - enabled: 1
     path: Assets/Scenes/Combat.unity
-    guid: 35f9e23fc9d373d4f83137c2aa9c6739
+    guid: 3982c7b7688846e41a79692c25ef3081
   - enabled: 1
     path: Assets/Scenes/Backrooms.unity
     guid: b6f0970861c3a4075a1bf28b9bbb7516
+  - enabled: 1
+    path: Assets/Scenes/BossBattle.unity
+    guid: 2d5766d727bfa2a4cac58ed96fea1ab4
   m_configObjects: {}

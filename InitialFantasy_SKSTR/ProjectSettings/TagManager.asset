@@ -10,51 +10,45 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  -
+  - 
   - Water
   - UI
-  - Boss
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
-  -
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   m_SortingLayers:
   - name: Background
-    uniqueID: 2450340067
-    locked: 0
-  - name: Battle Station
-    uniqueID: 18235989
+    uniqueID: 2037844521
     locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: HUD
-    uniqueID: 3704787865
+  - name: UI
+    uniqueID: 1309786627
     locked: 0
   - name: Boss
-    uniqueID: 3733943711
-    locked: 0
-  - name: Front
-    uniqueID: 3542942755
+    uniqueID: 2284834537
     locked: 0
