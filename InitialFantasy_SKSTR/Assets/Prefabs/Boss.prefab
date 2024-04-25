@@ -103,7 +103,7 @@ MonoBehaviour:
   xp: 999
   levelUpAmount: 999
   attackDamage: 10
-  currentHp: 0
+  currentHp: 150
   maxHp: 150
 --- !u!95 &7986634841690803011
 Animator:
