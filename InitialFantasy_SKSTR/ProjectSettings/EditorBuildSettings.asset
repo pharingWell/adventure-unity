@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Combat.unity
     guid: 35f9e23fc9d373d4f83137c2aa9c6739
+  - enabled: 1
+    path: Assets/Scenes/Backrooms.unity
+    guid: b6f0970861c3a4075a1bf28b9bbb7516
   m_configObjects: {}
