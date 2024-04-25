@@ -15,26 +15,65 @@ Used for: Document System (Scripts: NoteAppear)
 public class NoteAppear : MonoBehaviour
 {
     [SerializeField]
-    private Image documentImage; 
+    private Image documentImage;
     public TextMeshProUGUI documentTitleText;
+    public TextMeshProUGUI documentBodyText;
+    public TextMeshProUGUI openText;
+    public TextMeshProUGUI closeText;
 
-    public TextMeshProUGUI  documentBodyText;
-    
+    private bool openAllowed;
+    private bool isDocumentOpen = false;
+
+    private void Update() {
+        if (openAllowed && Input.GetKeyDown(KeyCode.E)) {
+            if (isDocumentOpen) {
+                Close();
+            } else {
+                Open();
+            }
+        }
+    }
 
     void OnTriggerEnter2D(Collider2D other) {
         if (other.CompareTag("Player")) {
-            documentImage.enabled = true;
-            documentTitleText.enabled = true;
-            documentBodyText.enabled = true;
+            openText.enabled = true;
+            openText.text = "Press E to open document";
+            openAllowed = true;
         }
     }
 
     void OnTriggerExit2D(Collider2D other) {
         if (other.CompareTag("Player")) {
-            documentImage.enabled = false;
-            documentTitleText.enabled = false;
-            documentBodyText.enabled = false;
-
+            openText.enabled = false;
+            openAllowed = false;
+            if (isDocumentOpen) {
+                Close();
+            }
         }
     }
+
+    void Open() {
+        documentImage.enabled = true;
+        documentTitleText.enabled = true;
+        documentBodyText.enabled = true;
+
+        openText.enabled = false;  // Disable the "open" text
+        closeText.enabled = true;
+        closeText.text = "Press E to close document"; // Set close text
+
+        isDocumentOpen = true;
+    }
+
+    void Close() {
+        documentImage.enabled = false;
+        documentTitleText.enabled = false;
+        documentBodyText.enabled = false;
+
+        closeText.enabled = false; // Disable the close text
+        openText.enabled = true;
+        //openText.text = "Press E to open document"; // Reset open text
+
+        isDocumentOpen = false;
+    }
 }
+
