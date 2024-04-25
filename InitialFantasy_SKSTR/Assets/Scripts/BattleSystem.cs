@@ -25,7 +25,9 @@ public class BattleSystem : MonoBehaviour
     // two instances of Unit
     Unit playerUnit;
     Unit enemyUnit;
-
+    private GameObject playerGo;
+    private GameObject enemyGo;
+    
     public IPanel DialoguePanel;
     public TextMeshProUGUI dialogueText; // use TextMeshProUGUI for hud
     public BattleHUD playerHUD;
@@ -51,7 +53,6 @@ public class BattleSystem : MonoBehaviour
     
     void GameSaved()
     {
-        playerUnit.Health = 1;
         Destroy(enemyGo);
         Destroy(enemyUnit);
         Destroy(playerGo);
@@ -61,10 +62,10 @@ public class BattleSystem : MonoBehaviour
     
     void GameLoaded()
     {
-        Setup();
+        StartCoroutine(SetupBattle());
     }
 
-    void Setup()
+    IEnumerator SetupBattle()
     {
         actions.SetActive(false);
         // instantiate a player game object using the player prefab

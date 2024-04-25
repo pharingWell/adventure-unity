@@ -158,7 +158,7 @@ public class BossBattleSystem : MonoBehaviour
             previousColor = color;
             yield return new WaitForSeconds(1f);
         }
-        Debug.Log(string.Join(" ", _enemyColor));
+        //Debug.Log(string.Join(" ", _enemyColor));
         enemyBBStationSprite.color = new Color(0, 0, 0, 1);
         bool isDead = playerUnit.TakeDamage(enemyUnit.AttackDamage); // is player dead after taking damage?
         playerHUD.SetHp(playerUnit.Health); // player's hp bar reflects new hp; also updates hp text
