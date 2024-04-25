@@ -1160,7 +1160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 305b5eb796f14534dbe5071300468aee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneBuildIndex: 2
+  sceneBuildIndex: 1
 --- !u!61 &1178673234
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3593,7 +3593,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c57ffc5ac9d7a69468dcd4b82537179f, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 04c8e81db367f224aa7f3b59eeae0370, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
