@@ -298,7 +298,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7223528245980153065, guid: a7c2cf413464e46438f02d1227d2c172, type: 3}
       propertyPath: dialogue.name
-      value: Howard
+      value: HOWARD
       objectReference: {fileID: 0}
     - target: {fileID: 7223528245980153065, guid: a7c2cf413464e46438f02d1227d2c172, type: 3}
       propertyPath: dialogue.sentences.Array.size
@@ -405,7 +405,8 @@ PrefabInstance:
       value: 13
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8814806015275986842, guid: a7c2cf413464e46438f02d1227d2c172, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7c2cf413464e46438f02d1227d2c172, type: 3}

@@ -4,7 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
+/* REFERENCES: 
+Title: "How to Make a Dialogue System in Unity" [YouTube Video]
+Author: Brackeys
+Date: July 23rd, 2017
+URL: https://www.youtube.com/watch?v=_nRzoTzeyxU&t=693s&ab_channel=Brackeys  
+GitHub Code: https://github.com/Brackeys/Dialogue-System.git 
+Publisher: YouTube and GitHub
+*/
 
 public class DialogueManager: MonoBehaviour
 {
@@ -14,14 +21,13 @@ public class DialogueManager: MonoBehaviour
     public Animator animator;
 
 	private Queue<string> sentences;
-	public Dialogue dialogue;
 
 	// Use this for initialization
 	void Start () {
 		sentences = new Queue<string>();
 	}
 
-	public void StartDialogue ()
+	public void StartDialogue (Dialogue dialogue)
 	{
 		animator.SetBool("IsOpen", true);
 
