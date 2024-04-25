@@ -12,7 +12,7 @@ URL: https://youtube.com/watch?v=eVre2i6gPF0
 Publisher: YouTube
 Used for: Document System (Scripts: NoteAppear) 
 */
-public class NoteAppear : MonoBehaviour
+public class DocumentSystem : MonoBehaviour
 {
     [SerializeField]
     private Image documentImage;
