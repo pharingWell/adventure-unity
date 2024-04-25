@@ -47,22 +47,16 @@ public class BattleSystem : MonoBehaviour
     {
         state = BattleState.START;
         StartCoroutine(SetupBattle());
-        SaveSerializer.GameDataSaved += GameSaved;
-        SaveSerializer.GameDataLoaded += GameLoaded;
+
     }
     
     void GameSaved()
     {
-        Destroy(enemyGo);
-        Destroy(enemyUnit);
-        Destroy(playerGo);
-        Destroy(playerUnit);
-        SaveSystem.Load();
+
     }
     
     void GameLoaded()
     {
-        StartCoroutine(SetupBattle());
     }
 
     IEnumerator SetupBattle()
