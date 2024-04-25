@@ -8,7 +8,7 @@ public class SceneLoader : MonoBehaviour
     void Start()
     {
         // Start the coroutine to load the new scene
-        StartCoroutine(LoadNewSceneAfterDelay("House", 3f));
+        StartCoroutine(LoadNewSceneAfterDelay("House", 2.5f));
     }
 
     IEnumerator LoadNewSceneAfterDelay(string sceneName, float delay)
