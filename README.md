@@ -1,11 +1,8 @@
 ## Description
-The official respository for the development of Initial Fantasty: Splendant Kingdom Small Town Requiem, \
-A video game based off the physical prototype "Adventure", found [here](https://docs.google.com/document/d/e/2PACX-1vQ87HhE5cyyphW9_ZRLqMLkOnxBg9ZqbRN_EPmjhNWeleZbon7kvFSi5Fj7ow3wa11D2flzeh-Xye14/pub).
+This is the respository for "Initial Fantasty: Splendant Kingdom Small Town Requiem" \
+The video game was based off Sebastian's physical prototype "Adventure", found [here](https://docs.google.com/document/d/e/2PACX-1vQ87HhE5cyyphW9_ZRLqMLkOnxBg9ZqbRN_EPmjhNWeleZbon7kvFSi5Fj7ow3wa11D2flzeh-Xye14/pub), and was made during the 2024 spring section of CS4730: Computer Game Design, held at the University of Virginia. \
 
-Initial Fantasy: Splendant Kingdom Small Town Requiem (IF: SKSTR) \
-Made for the UVA class CS4730: Computer Game Design \
 Developers: Sebastian Fugle, Tiara Allard,  Courtney Green, Tobias Suh
-
 
 ## Sources: 
 ### For work on Scripts/StateMachine.cs:\
